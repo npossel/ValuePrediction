@@ -100,6 +100,6 @@ bool vp::get_enable() {
     return enable;
 }
 
-bool vp::get_type() {
+bool vp::get_perf() {
     return perf;
 }

@@ -16,7 +16,7 @@ void pipeline_t::dispatch() {
    bool B_ready;
    bool D_ready;
    bool enable;
-   bool vp_type;
+   bool vp_perf;
    db_t* actual;
 
    // Stall the Dispatch Stage if either:
@@ -164,9 +164,9 @@ void pipeline_t::dispatch() {
       // not clearing ready bits of everything in the dispatch bundle, just those not predicted.
 
       enable = VP->get_enable();
-      vp_type = VP->get_type();
+      vp_perf = VP->get_perf();
       if(enable) {
-         if(PAY.buf[index].good_instruction && PAY.buf[index].C_valid && !branch_flag && vp_type) {
+         if(PAY.buf[index].good_instruction && PAY.buf[index].C_valid && !branch_flag && vp_perf) {
             // set prf ready bit and write perfect predicted value into prf
             actual = get_pipe()->peek(PAY.buf[index].db_index);
             REN->set_ready(PAY.buf[index].C_phys_reg);
