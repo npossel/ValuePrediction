@@ -50,6 +50,9 @@ void pipeline_t::rename2() {
    unsigned int i;
    unsigned int index;
    unsigned int bundle_dst, bundle_branch;
+   bool enable;
+   bool vpq_size;
+   bool eligible;
 
    // Stall the rename2 sub-stage if either:
    // (1) There isn't a current rename bundle.
@@ -144,6 +147,22 @@ void pipeline_t::rename2() {
       if(PAY.buf[index].C_valid)
          PAY.buf[index].C_phys_reg = REN->rename_rdst(PAY.buf[index].C_log_reg);
       // FIX_ME #3 END
+
+
+      // VALUE PREDICT (if enabled)
+      // predict value of destination register and only use if confident
+      // consult value predictor using the pc
+      // receive prediction and confidence
+      // discard if below the confidence threshold, else keep prediction in the rename bundle
+      // be sure to allocate an entry into vpq for any eligible instruction
+
+      enable = VP->get_enable();
+      eligible = VP->eligible(PAY.buf[index].flags);
+      vpq_size = VP->get_size();
+      if(enable && eligible && vpq_size > 0) {
+         VP->vpq_allocate(PAY.buf[index].pc);
+         
+      }
 
       // FIX_ME #4
       // Get the instruction's branch mask.

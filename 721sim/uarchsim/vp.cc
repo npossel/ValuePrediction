@@ -46,6 +46,8 @@ vp::vp(bool n_enable,
     // Data struc allocation and initialization
     valuepredqueue val;
     vpq.resize(size, val);
+    vpq_h = 0;
+    vpq_t = 0;
 }
 
 vp::~vp() {
@@ -84,22 +86,28 @@ void vp::vp_stats(uint64_t num_instr, FILE* fp) {
             100.0*(double)n_unconf_incorr/(double)num_instr);
 }
 
-void vp::inc_ineligible_type() {
-    n_ineligible_type++;
+// This function checks value-prediction eligibility.
+// predINTALU, predFPALU, and predLOAD are all "bool" types of my stride predictor class,
+// and are configured to be true or false based on the --vp-svp instruction type arguments being 1 or 0,
+// respectively.
+bool vp::eligible(unsigned int flags) {
+   if (IS_INTALU(flags))
+      return(predINTALU);     // instr. is INTALU type.  It is eligible if predINTALU is configured "true".
+   else if (IS_FPALU(flags))
+      return(predFPALU);      // instr. is FPALU type.  It is eligible if predFPALU is configured "true".
+   else if (IS_LOAD(flags) && !IS_AMO(flags))
+      return(predLOAD);      // instr. is a normal LOAD (not rare load-with-reserv).  It is eligible if predLOAD is configured "true".
+   else
+      return(false);     // instr. is none of the above major types, so it is never eligible
 }
 
-void vp::inc_ineligible_drop() {
-    n_ineligible_drop++;
-}
-
-void vp::inc_conf_corr() {
-    n_conf_corr++;
-}
-
-bool vp::get_enable() {
-    return enable;
-}
-
-bool vp::get_perf() {
-    return perf;
+// This function allocates a spot for the eligible instruction into the vpq
+// and increments the tail pointer for future allocations.
+void vp::vpq_allocate(uint64_t PC) {
+    vpq[vpq_t].PC = PC;
+    vpq_t++;
+    if(vpq_t == size) {
+        vpq_t = 0;
+        vpq_tp = !vpq_tp;
+    }
 }

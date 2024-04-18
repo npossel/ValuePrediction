@@ -48,7 +48,9 @@ private:
     
     std::vector<valuepredqueue> vpq;
     uint64_t vpq_h = 0;
+    uint64_t vpq_hp = 0;
     uint64_t vpq_t = 0;
+    uint64_t vpq_tp = 0;
 public:
     // This is the constructor for the value predictor
     vp(bool n_enable,
@@ -73,18 +75,33 @@ public:
     // Stat printer function
     void vp_stats(uint64_t num_instr, FILE* fp);
 
-    // increment ineligible due to type count
-    void inc_ineligible_type();
+    // Increment ineligible due to type count
+    void inc_ineligible_type(){n_ineligible_type++;}
 
-    // increment ineligible due to drop count
-    void inc_ineligible_drop();
+    // Increment ineligible due to drop count
+    void inc_ineligible_drop(){n_ineligible_drop++;}
 
-    // increment confident correct count
-    void inc_conf_corr();
+    // Increment confident correct count
+    void inc_conf_corr(){n_conf_corr++;}
 
-    // get vp enable
-    bool get_enable();
+    // Get vp enable
+    bool get_enable(){return enable;}
 
-    // get vp type
-    bool get_perf();
+    // Get vp type
+    bool get_perf(){return perf;}
+
+    // Get vpq size
+    bool get_size(){return size;}
+
+    // Get the confidence of the value prediction
+    uint64_t get_confidence(uint64_t PC_tag);
+
+    // Get the prediction of the instruction
+    uint64_t predict(uint64_t PC_tag);
+
+    // Allocate entry in VPQ
+    void vpq_allocate(uint64_t PC);
+
+    // Check value-prediction eligibility
+    bool eligible(unsigned int flags);
 };
