@@ -114,11 +114,23 @@ void pipeline_t::retire(size_t& instret) {
 	    inc_counter(commit_count);
 
       // increment value prediction counter
-       if(PAY.buf[PAY.head].predicted_correct) {
-         VP->inc_conf_corr();
-       }
-       else {
+       if(PAY.buf[PAY.head].in_type)
          VP->inc_ineligible_type();
+       else if(PAY.buf[PAY.head].in_drop)
+         VP->inc_ineligible_drop();
+       else if(PAY.buf[PAY.head].miss)
+         VP->inc_miss();
+       else if(PAY.buf[PAY.head].confident) {
+         if(PAY.buf[PAY.head].correct)
+            VP->inc_conf_corr();
+         else if(!PAY.buf[PAY.head].correct)
+            VP->inc_conf_incorr();
+       }
+       else if(!PAY.buf[PAY.head].confident) {
+         if(PAY.buf[PAY.head].correct)
+            VP->inc_unconf_corr();
+         else if(!PAY.buf[PAY.head].correct)
+            VP->inc_unconf_incorr();
        }
 
 	 }

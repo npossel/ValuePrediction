@@ -110,7 +110,8 @@ void pipeline_t::dispatch() {
       // Choose an execution lane for the instruction.
       PAY.buf[index].lane_id = (PRESTEER ? steer(PAY.buf[index].fu) : fu_lane_matrix[(unsigned int)PAY.buf[index].fu]);
 
-      PAY.buf[index].predicted_correct = false;
+      // PAY.buf[index].in_type = false;
+      // PAY.buf[index].confident = false;
 
       // FIX_ME #7
       // Dispatch the instruction into the Active List.
@@ -171,7 +172,12 @@ void pipeline_t::dispatch() {
             actual = get_pipe()->peek(PAY.buf[index].db_index);
             REN->set_ready(PAY.buf[index].C_phys_reg);
             REN->write(PAY.buf[index].C_phys_reg, actual->a_rdst[0].value);
-            PAY.buf[index].predicted_correct = true;
+            PAY.buf[index].confident = true;
+            PAY.buf[index].correct = true;
+         }
+         else {
+            PAY.buf[index].in_type = true;
+            PAY.buf[index].confident = false;
          }
       }
 
@@ -221,7 +227,7 @@ void pipeline_t::dispatch() {
       // 2. If the instruction has a destination register, then clear its ready bit; otherwise do nothing.
 
       // FIX_ME #9 BEGIN
-      if(PAY.buf[index].C_valid && !PAY.buf[index].predicted_correct)
+      if(PAY.buf[index].C_valid && !PAY.buf[index].confident)
          REN->clear_ready(PAY.buf[index].C_phys_reg);
       // FIX_ME #9 END
 

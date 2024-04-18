@@ -54,6 +54,8 @@ void pipeline_t::rename2() {
    bool vpq_size;
    bool eligible;
    bool confident;
+   bool perf;
+   uint64_t prediction;
 
    // Stall the rename2 sub-stage if either:
    // (1) There isn't a current rename bundle.
@@ -156,16 +158,19 @@ void pipeline_t::rename2() {
       // receive prediction and confidence
       // discard if below the confidence threshold, else keep prediction in the rename bundle
       // be sure to allocate an entry into vpq for any eligible instruction
-
       enable = VP->get_enable();
       eligible = VP->eligible(PAY.buf[index].flags);
+      perf = VP->get_perf();
       vpq_size = VP->get_size();
-      if(enable && eligible && vpq_size > 0) {
-         VP->vpq_allocate(PAY.buf[index].pc);
-         // implement stall/skip if the vpq is full
-         confident = VP->get_confidence(PAY.buf[index].pc);
-         if(confident) {
-            // predict the value
+      if(enable) {
+         if(eligible && vpq_size > 0) {
+            PAY.buf[index].vpq_entry = VP->vpq_allocate(PAY.buf[index].pc);
+            // implement stall/skip if the vpq is full
+            PAY.buf[index].prediction = VP->predict(PAY.buf[index].pc, PAY.buf[index].miss);
+            PAY.buf[index].confident = VP->get_confidence(PAY.buf[index].pc);
+         }
+         else if(!eligible && !perf) {
+            PAY.buf[index].in_type = true;
          }
       }
 

@@ -100,7 +100,7 @@ void issue_queue::wakeup(unsigned int tag) {
 
 	for (unsigned int i = 0; i < size; i++) {
 		if (q[i].valid) {					// Only consider valid issue queue entries.
-			if (q[i].A_valid && (tag == q[i].A_tag) && !proc->PAY.buf[q[i].index].predicted_correct) {	// Check first source operand.
+			if (q[i].A_valid && (tag == q[i].A_tag) && !proc->PAY.buf[q[i].index].confident) {	// Check first source operand.
 				// assert(!q[i].A_ready);
 				q[i].A_ready = true;
         #ifdef RISCV_MICRO_DEBUG
@@ -109,7 +109,7 @@ void issue_queue::wakeup(unsigned int tag) {
         #endif
 
 			}
-			if (q[i].B_valid && (tag == q[i].B_tag) && !proc->PAY.buf[q[i].index].predicted_correct) {	// Check second source operand.
+			if (q[i].B_valid && (tag == q[i].B_tag) && !proc->PAY.buf[q[i].index].confident) {	// Check second source operand.
 				// assert(!q[i].B_ready);
 				q[i].B_ready = true;
         #ifdef RISCV_MICRO_DEBUG
@@ -117,7 +117,7 @@ void issue_queue::wakeup(unsigned int tag) {
           dump_iq(proc,i,proc->issue_log);
         #endif
 			}
-			if (q[i].D_valid && (tag == q[i].D_tag) && !proc->PAY.buf[q[i].index].predicted_correct) {	// Check third source operand.
+			if (q[i].D_valid && (tag == q[i].D_tag) && !proc->PAY.buf[q[i].index].confident) {	// Check third source operand.
 				// assert(!q[i].D_ready);
 				q[i].D_ready = true;
         #ifdef RISCV_MICRO_DEBUG

@@ -85,6 +85,18 @@ public:
     // Increment confident correct count
     void inc_conf_corr(){n_conf_corr++;}
 
+    // Increment confident incorrect count
+    void inc_conf_incorr(){n_conf_incorr++;}
+
+    // Increment unconfident correct count
+    void inc_unconf_corr(){n_unconf_corr++;}
+
+    // Increment unconfident incorrect count
+    void inc_unconf_incorr(){n_unconf_incorr++;}
+
+    // Increment miss count
+    void inc_miss(){n_miss++;}
+
     // Get vp enable
     bool get_enable(){return enable;}
 
@@ -97,12 +109,12 @@ public:
     // Get the confidence of the value prediction
     bool get_confidence(uint64_t PC);
 
-    // Get the prediction of the instruction
-    uint64_t predict(uint64_t PC_tag);
-
-    // Allocate entry in VPQ
-    void vpq_allocate(uint64_t PC);
-
     // Check value-prediction eligibility
     bool eligible(unsigned int flags);
+    
+    // Get the prediction of the instruction
+    uint64_t predict(uint64_t PC, bool& miss);
+
+    // Allocate entry in VPQ
+    uint64_t vpq_allocate(uint64_t PC);
 };

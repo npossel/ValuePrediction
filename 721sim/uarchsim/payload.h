@@ -179,12 +179,20 @@ typedef struct {
    unsigned int D_phys_reg;     // If there exists a third ** SOURCE ** register (D),
                                 // this is the physical register specifier to
                                 // which it is renamed.
-   bool confident;              // Says if the 
   
    // Branch ID, for checkpointed branches only.
    unsigned int branch_ID;      // When a checkpoint is created for a branch,
                                 // this is the branch's ID (its bit position
                                 // in the Global Branch Mask).
+
+   // Value prediction
+   bool confident;              // flag for if the value is predicted confident.
+   bool correct;                // flag for if the value is correct or not.
+   bool miss;                   // flag for if the instruction missed in the SVP.
+   bool in_type;                // flag for if the instruction is ineligible due to type
+   bool in_drop;                // flag for if the instruction is ineligible due to being dropped.
+   uint64_t prediction;         // prediction value from the VPU
+   uint64_t vpq_entry;          // VPQ entry number
 
    ////////////////////////
    // Set by Dispatch Stage.
@@ -197,7 +205,6 @@ typedef struct {
    bool SQ_phase;
 
    unsigned int lane_id;        // Execution lane chosen for the instruction.
-   bool predicted_correct;              // flag for if the value is predicted.
 
    ////////////////////////
    // Set by Reg. Read Stage.

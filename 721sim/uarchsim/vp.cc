@@ -95,7 +95,9 @@ void vp::vp_stats(uint64_t num_instr, FILE* fp) {
 // is not yet in the SVP, return false.
 bool vp::get_confidence(uint64_t PC) {
     uint64_t index_n = (PC & ((1<<(index+2))-1))>>2;
-    if(svp[index_n].conf == confmax)
+    uint64_t tag_n = (PC & ((1<<(tag+index+2))-1))>>(index+2);
+
+    if(svp[index_n].conf == confmax && (svp[index_n].tag == tag_n || tag==0))
         return true;
     else
         return false;
@@ -116,13 +118,29 @@ bool vp::eligible(unsigned int flags) {
       return(false);     // instr. is none of the above major types, so it is never eligible
 }
 
+uint64_t vp::predict(uint64_t PC, bool& miss) {
+    uint64_t prediction;
+    uint64_t index_n = (PC & ((1<<(index+2))-1))>>2;
+    uint64_t tag_n = (PC & ((1<<(tag+index+2))-1))>>(index+2);
+
+    if(svp[index_n].tag == tag_n || tag==0) {
+        prediction = svp[index_n].retired_value + (svp[index_n].instance * svp[index_n].stride);
+        return prediction;
+    }
+    else {
+        miss = true;
+        return 0;
+    }
+}
+
 // This function allocates a spot for the eligible instruction into the vpq
 // and increments the tail pointer for future allocations.
-void vp::vpq_allocate(uint64_t PC) {
+uint64_t vp::vpq_allocate(uint64_t PC) {
     vpq[vpq_t].PC = PC;
     vpq_t++;
     if(vpq_t == size) {
         vpq_t = 0;
         vpq_tp = !vpq_tp;
     }
+    return vpq_t-1;
 }
