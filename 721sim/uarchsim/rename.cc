@@ -53,6 +53,7 @@ void pipeline_t::rename2() {
    bool enable;
    bool vpq_size;
    bool eligible;
+   bool confident;
 
    // Stall the rename2 sub-stage if either:
    // (1) There isn't a current rename bundle.
@@ -161,7 +162,11 @@ void pipeline_t::rename2() {
       vpq_size = VP->get_size();
       if(enable && eligible && vpq_size > 0) {
          VP->vpq_allocate(PAY.buf[index].pc);
-         
+         // implement stall/skip if the vpq is full
+         confident = VP->get_confidence(PAY.buf[index].pc);
+         if(confident) {
+            // predict the value
+         }
       }
 
       // FIX_ME #4

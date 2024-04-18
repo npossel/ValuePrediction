@@ -44,6 +44,10 @@ vp::vp(bool n_enable,
     full_policy = n_full_policy;
 
     // Data struc allocation and initialization
+    entries = 2^(index);
+    stridevaluepred str;
+    svp.resize(entries, str);
+
     valuepredqueue val;
     vpq.resize(size, val);
     vpq_h = 0;
@@ -84,6 +88,17 @@ void vp::vp_stats(uint64_t num_instr, FILE* fp) {
     fprintf(fp, "   vpmeas_unconf_incorr   : %10d (%6.2f%%) // VPU generated an unconfident and incorrect value prediction.\n",
             n_unconf_incorr,
             100.0*(double)n_unconf_incorr/(double)num_instr);
+}
+
+// Search the SVP using the PC tag (if there is one) and check confidence.
+// Return true if the predictor is confident. If the predictor is not confident or the instruction
+// is not yet in the SVP, return false.
+bool vp::get_confidence(uint64_t PC) {
+    uint64_t index_n = (PC & ((1<<(index+2))-1))>>2;
+    if(svp[index_n].conf == confmax)
+        return true;
+    else
+        return false;
 }
 
 // This function checks value-prediction eligibility.

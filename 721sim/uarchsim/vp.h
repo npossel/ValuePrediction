@@ -45,6 +45,7 @@ private:
     unsigned int n_unconf_incorr;
 
     std::vector<stridevaluepred> svp;
+    uint64_t entries;
     
     std::vector<valuepredqueue> vpq;
     uint64_t vpq_h = 0;
@@ -94,7 +95,7 @@ public:
     bool get_size(){return size;}
 
     // Get the confidence of the value prediction
-    uint64_t get_confidence(uint64_t PC_tag);
+    bool get_confidence(uint64_t PC);
 
     // Get the prediction of the instruction
     uint64_t predict(uint64_t PC_tag);
