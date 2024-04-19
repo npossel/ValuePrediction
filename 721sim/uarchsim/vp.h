@@ -111,9 +111,18 @@ public:
 
     // Check value-prediction eligibility
     bool eligible(unsigned int flags);
+
+    // Get oracle
+    bool get_oracle(){return oracle;}
+
+    // Get the val stored in vpq
+    uint64_t get_vpqval(uint64_t index) {return vpq[index].val;}
     
     // Get the prediction of the instruction
     uint64_t predict(uint64_t PC, bool& miss);
+
+    // Train the stride value predictor
+    void train(uint64_t PC, uint64_t val);
 
     // Get the VPQ full policy
     bool get_policy(){return full_policy;}

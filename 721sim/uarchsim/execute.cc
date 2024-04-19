@@ -78,6 +78,16 @@ void pipeline_t::execute(unsigned int lane_number) {
                      IQ.wakeup(PAY.buf[index].C_phys_reg);
                      REN->set_ready(PAY.buf[index].C_phys_reg);
                      REN->write(PAY.buf[index].C_phys_reg, PAY.buf[index].C_value.dw);
+                     PAY.buf[index].correct = false;
+                  }
+                  else if (PAY.buf[index].prediction.dw == PAY.buf[index].C_value.dw && !PAY.buf[index].confident) {
+                     IQ.wakeup(PAY.buf[index].C_phys_reg);
+                     REN->set_ready(PAY.buf[index].C_phys_reg);
+                     REN->write(PAY.buf[index].C_phys_reg, PAY.buf[index].C_value.dw);
+                     PAY.buf[index].correct = true;
+                  }
+                  else if (PAY.buf[index].prediction.dw == PAY.buf[index].C_value.dw && PAY.buf[index].confident){
+                     PAY.buf[index].correct = true;
                   }
                }
                else {
@@ -115,6 +125,16 @@ void pipeline_t::execute(unsigned int lane_number) {
                      PAY.buf[index].C_value.dw = 0;
                      REN->set_ready(PAY.buf[index].C_phys_reg);
                      REN->write(PAY.buf[index].C_phys_reg, 0);
+                     PAY.buf[index].correct = false;
+                  }
+                  else if (PAY.buf[index].prediction.dw == PAY.buf[index].C_value.dw && !PAY.buf[index].confident) {
+                     PAY.buf[index].C_value.dw = 0;
+                     REN->set_ready(PAY.buf[index].C_phys_reg);
+                     REN->write(PAY.buf[index].C_phys_reg, 0);
+                     PAY.buf[index].correct = true;
+                  }
+                  else if (PAY.buf[index].prediction.dw == PAY.buf[index].C_value.dw && PAY.buf[index].confident){
+                     PAY.buf[index].correct = true;
                   }
                }
                else {
@@ -164,6 +184,14 @@ void pipeline_t::execute(unsigned int lane_number) {
             if(PAY.buf[index].predicted) {
                if(PAY.buf[index].prediction.dw != PAY.buf[index].C_value.dw){
                   REN->write(PAY.buf[index].C_phys_reg, PAY.buf[index].C_value.dw);
+                  PAY.buf[index].correct = false;
+               }
+               else if (PAY.buf[index].prediction.dw == PAY.buf[index].C_value.dw && !PAY.buf[index].confident) {
+                  REN->write(PAY.buf[index].C_phys_reg, PAY.buf[index].C_value.dw);
+                  PAY.buf[index].correct = true;
+               }
+               else if (PAY.buf[index].prediction.dw == PAY.buf[index].C_value.dw && PAY.buf[index].confident){
+                  PAY.buf[index].correct = true;
                }
             }
             else {
@@ -290,6 +318,16 @@ void pipeline_t::load_replay() {
                IQ.wakeup(PAY.buf[index].C_phys_reg);
                REN->set_ready(PAY.buf[index].C_phys_reg);
                REN->write(PAY.buf[index].C_phys_reg, PAY.buf[index].C_value.dw);
+               PAY.buf[index].correct = false;
+            }
+            else if (PAY.buf[index].prediction.dw == PAY.buf[index].C_value.dw && !PAY.buf[index].confident) {
+               IQ.wakeup(PAY.buf[index].C_phys_reg);
+               REN->set_ready(PAY.buf[index].C_phys_reg);
+               REN->write(PAY.buf[index].C_phys_reg, PAY.buf[index].C_value.dw);
+               PAY.buf[index].correct = true;
+            }
+            else if (PAY.buf[index].prediction.dw == PAY.buf[index].C_value.dw && PAY.buf[index].confident) {
+               PAY.buf[index].correct = true;
             }
          }
          else {

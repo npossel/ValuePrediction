@@ -125,11 +125,64 @@ uint64_t vp::predict(uint64_t PC, bool& miss) {
 
     if(svp[index_n].tag == tag_n || tag==0) {
         prediction = svp[index_n].retired_value + (svp[index_n].instance * svp[index_n].stride);
+        svp[index_n].instance++;
         return prediction;
     }
     else {
         miss = true;
         return 0;
+    }
+}
+
+void vp::train(uint64_t PC, uint64_t val) {
+    uint64_t index_n = (PC & ((1<<(index+2))-1))>>2;
+    uint64_t tag_n = (PC & ((1<<(tag+index+2))-1))>>(index+2);
+    uint64_t new_stride;
+    uint64_t tmp_tail;
+    uint64_t i;
+
+    if(svp[index_n].tag == tag_n || tag==0) {
+        new_stride = val-svp[index_n].retired_value;
+        if(new_stride==svp[index_n].stride) {
+            svp[index_n].conf += confinc;
+            // saturate the confidence
+            if(svp[index_n].conf > confmax)
+                svp[index_n].conf = confmax;
+        }
+        else {
+            if(svp[index_n].conf <= replace_stride)
+                svp[index_n].stride = new_stride;
+            if(confdec > 0){
+                svp[index_n].conf -= confdec;
+                //saturate the confidence
+                if(svp[index_n].conf < 0)
+                    svp[index_n].conf = 0;
+            }
+            else
+                svp[index_n].conf = 0;
+        }
+        svp[index_n].retired_value = val;
+        svp[index_n].instance--;
+        if(svp[index_n].instance < 0)
+            svp[index_n].instance = 0;
+    }
+    else if(svp[index_n].conf <= replace) {
+        // Initialize
+        svp[index_n].tag = tag_n;
+        svp[index_n].conf = 0;
+        svp[index_n].retired_value = val;
+        svp[index_n].stride = val;
+        i = vpq_h;
+        while(bool j = true) {
+            if(vpq[i].PC == PC) {
+                svp[index_n].instance++;
+            }
+            i++;
+            if(i == size)
+                i = 0;
+            if(i == vpq_t + 1)
+                j = false;
+        }
     }
 }
 
