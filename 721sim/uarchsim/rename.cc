@@ -124,6 +124,7 @@ void pipeline_t::rename2() {
 
    // Stall if the policy is to stall and there aren't enough entries available
    if(!VP->get_policy() && VP->stall_vpq(bundle_instr) && !perf){
+      printf("\n We shouldn't be in here right now I don't think\n");
       return;
    }
    //
@@ -174,6 +175,8 @@ void pipeline_t::rename2() {
       vpq_size = VP->get_size();
       if(enable) {
          if(eligible && vpq_size > 0 && !VP->stall_vpq(1)) {
+            printf("\n We are in the RENAME eligible if statement\n");
+
             PAY.buf[index].vpq_entry = VP->vpq_allocate(PAY.buf[index].pc);
             PAY.buf[index].in_vpq = true;
             PAY.buf[index].prediction.dw = VP->predict(PAY.buf[index].pc, PAY.buf[index].miss);
@@ -185,6 +188,7 @@ void pipeline_t::rename2() {
             // Specifically for Oracle mode. If the prediction matches, it is confident, else it is not.
             // This allows for skipping of the recovery step
             if(VP->get_oracle()) {
+               printf("\n We are in the RENAME oracle if statement\n");
                actual = get_pipe()->peek(PAY.buf[index].db_index);
                if(PAY.buf[index].prediction.dw == actual->a_rdst[0].value)
                   PAY.buf[index].confident = true;
@@ -193,10 +197,12 @@ void pipeline_t::rename2() {
             }
          }
          else if(!eligible && !perf) {
+            printf("\n We are in the RENAME not eligible if statement\n");
             PAY.buf[index].in_type = true;
             PAY.buf[index].in_drop = false;
             PAY.buf[index].predicted = false;
          }else if(VP->stall_vpq(1) && !perf){
+            printf("\n We should not be in here right now\n");
             PAY.buf[index].in_drop = true;
             PAY.buf[index].predicted = true;
          }

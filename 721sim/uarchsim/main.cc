@@ -166,15 +166,15 @@ static void set_vp_flags(const char* config) {
       exit(-1);
    }
    else {
-      VPQSIZE = (VPQsize ? true : false);
+      VPQSIZE = (VPQsize ? VPQsize : 0);
       ORACLECONF = (oracleconf ? true : false);
-      NUM_INDEX_BITS = (index ? true : false);
-      NUM_TAG_BITS = (tag ? true : false);
-      CONFMAX = (confmax ? true : false);
-      CONFINC = (confinc ? true : false);
-      CONFDEC = (confdec ? true : false);
-      REPLACE_STRIDE = (replace_stride ? true : false);
-      REPLACE = (replace ? true : false);
+      NUM_INDEX_BITS = (index ? index : 0);
+      NUM_TAG_BITS = (tag ? tag : 0);
+      CONFMAX = (confmax ? confmax : 0);
+      CONFINC = (confinc ? confinc : 0);
+      CONFDEC = (confdec ? confdec : 0);
+      REPLACE_STRIDE = (replace_stride ? replace_stride : 0);
+      REPLACE = (replace ? replace : 0);
       PREDINTALU = (predINTALU ? true : false);
       PREDFPALU = (predFPALU ? true : false);
       PREDLOAD = (predLOAD ? true : false);

@@ -565,6 +565,9 @@ bool pipeline_t::step_micro(size_t instret_limit, size_t& instret)
 
         size_t lane_number;
 
+        if(stats->get_counter("commit_count")%1000 == 0) 
+          VP->debug(stats_log, stats->get_counter("commit_count"));
+
         unsigned int prev_commit_count = counter(commit_count);
         for (lane_number = 0; lane_number < RETIRE_WIDTH; lane_number++) {
           retire(instret);            // Retire Stage

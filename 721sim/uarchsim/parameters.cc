@@ -131,7 +131,7 @@ bool ENABLE_TRACE_CACHE = false;
 
 // Value prediction unit
 bool VP_ENABLE = false;
-bool VP_PERF = true;
+bool VP_PERF = false;
 unsigned int VPQSIZE = 0;
 bool ORACLECONF = false;
 unsigned int NUM_INDEX_BITS = 0;

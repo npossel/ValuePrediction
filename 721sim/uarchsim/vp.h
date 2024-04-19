@@ -1,13 +1,14 @@
 #include <stdio.h>
 #include <inttypes.h>
 #include <assert.h>
+#include <math.h>
 
 class stridevaluepred {
 public:
     uint64_t tag = 0;
     uint64_t conf = 0;
     uint64_t retired_value = 0;
-    uint64_t stride = 0;
+    int stride = 0;
     uint64_t instance = 0;
 };
 
@@ -135,4 +136,7 @@ public:
 
     // Deposit value into vpq entry
     void vpq_deposit(uint64_t index, uint64_t value);
+
+    // print debug
+    void debug(FILE* fp, uint64_t count);
 };

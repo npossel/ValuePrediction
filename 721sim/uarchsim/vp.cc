@@ -44,7 +44,8 @@ vp::vp(bool n_enable,
     full_policy = n_full_policy;
 
     // Data struc allocation and initialization
-    entries = 2^(index);
+    entries = pow(2, index);
+
     stridevaluepred str;
     svp.resize(entries, str);
 
@@ -88,6 +89,15 @@ void vp::vp_stats(uint64_t num_instr, FILE* fp) {
     fprintf(fp, "   vpmeas_unconf_incorr   : %10d (%6.2f%%) // VPU generated an unconfident and incorrect value prediction.\n",
             n_unconf_incorr,
             100.0*(double)n_unconf_incorr/(double)num_instr);
+}
+
+void vp::debug(FILE* fp, uint64_t count) {
+    fprintf(fp, "-------- DEBUG: retired instruction count = %lu\n", count);
+    fprintf(fp, "SVP entry #:   tag(hex)   conf   retired_value   stride   instance\n");
+    for(int i = 0; i < svp.size(); i++){
+        fprintf(fp, "%11d:%11X%7lu%16lu%9d%11lu\n", i, svp[i].tag, svp[i].conf, svp[i].retired_value, svp[i].stride, svp[i].instance);
+    }
+    fprintf(fp, "\n");
 }
 
 // Search the SVP using the PC tag (if there is one) and check confidence.
