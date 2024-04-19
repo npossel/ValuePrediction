@@ -1,6 +1,8 @@
 {
     "files.associations": {
-        "streambuf": "cpp"
+        "streambuf": "cpp",
+        "*.tcc": "cpp",
+        "string": "cpp"
     },
     "cmake.configureOnOpen": true
 }
