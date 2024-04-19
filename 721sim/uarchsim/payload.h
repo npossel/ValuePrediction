@@ -186,12 +186,14 @@ typedef struct {
                                 // in the Global Branch Mask).
 
    // Value prediction
+   bool predicted;              // flag for if the value was predicted
    bool confident;              // flag for if the value is predicted confident.
    bool correct;                // flag for if the value is correct or not.
    bool miss;                   // flag for if the instruction missed in the SVP.
    bool in_type;                // flag for if the instruction is ineligible due to type
    bool in_drop;                // flag for if the instruction is ineligible due to being dropped.
-   uint64_t prediction;         // prediction value from the VPU
+   bool in_vpq;                 // flag for if the instruction is in the vpq
+   union64_t prediction;         // prediction value from the VPU
    uint64_t vpq_entry;          // VPQ entry number
 
    ////////////////////////

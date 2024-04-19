@@ -145,9 +145,9 @@ uint64_t vp::vpq_allocate(uint64_t PC) {
     return vpq_t-1;
 }
 
-bool stall_vpq(uint64_t bundle_instr){
+bool vp::stall_vpq(uint64_t bundle_instr){
     if(vpq_tp == vpq_hp){
-        if(n_size - (vpq_t - vpq_h) >= bundle_instr){
+        if(size - (vpq_t - vpq_h) >= bundle_instr){
             return false;
         }
         return true;
@@ -157,4 +157,8 @@ bool stall_vpq(uint64_t bundle_instr){
        return false;
     }
     return true;
+}
+
+void vp::vpq_deposit(uint64_t index, uint64_t value) {
+        vpq[index].val = value;
 }

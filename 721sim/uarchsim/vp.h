@@ -14,7 +14,7 @@ public:
 class valuepredqueue {
 public:
     uint64_t PC = 0;
-    uint64_t val = 0;
+    uint64_t val;
 };
 class vp {
 private:
@@ -49,9 +49,9 @@ private:
     
     std::vector<valuepredqueue> vpq;
     uint64_t vpq_h = 0;
-    uint64_t vpq_hp = 0;
+    bool vpq_hp = 0;
     uint64_t vpq_t = 0;
-    uint64_t vpq_tp = 0;
+    bool vpq_tp = 0;
 public:
     // This is the constructor for the value predictor
     vp(bool n_enable,
@@ -123,4 +123,7 @@ public:
 
     // Stall VPQ if full policy is 0 and there aren't enough entries
     bool stall_vpq(uint64_t bundle_instr);
+
+    // Deposit value into vpq entry
+    void vpq_deposit(uint64_t index, uint64_t value);
 };

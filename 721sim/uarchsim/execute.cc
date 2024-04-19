@@ -73,9 +73,20 @@ void pipeline_t::execute(unsigned int lane_number) {
 
             // FIX_ME #13 BEGIN
             if(hit && PAY.buf[index].C_valid) {
-               IQ.wakeup(PAY.buf[index].C_phys_reg);
-               REN->set_ready(PAY.buf[index].C_phys_reg);
-               REN->write(PAY.buf[index].C_phys_reg, PAY.buf[index].C_value.dw);
+               if(PAY.buf[index].predicted) {
+                  if(PAY.buf[index].prediction.dw != PAY.buf[index].C_value.dw){ 
+                     IQ.wakeup(PAY.buf[index].C_phys_reg);
+                     REN->set_ready(PAY.buf[index].C_phys_reg);
+                     REN->write(PAY.buf[index].C_phys_reg, PAY.buf[index].C_value.dw);
+                  }
+               }
+               else {
+                  IQ.wakeup(PAY.buf[index].C_phys_reg);
+                  REN->set_ready(PAY.buf[index].C_phys_reg);
+                  REN->write(PAY.buf[index].C_phys_reg, PAY.buf[index].C_value.dw);
+               }
+               if(PAY.buf[index].in_vpq)
+                  VP->vpq_deposit(PAY.buf[index].vpq_entry, PAY.buf[index].C_value.dw);
             }
             // FIX_ME #13 END
          }
@@ -99,9 +110,20 @@ void pipeline_t::execute(unsigned int lane_number) {
             // Store-conditional: write 0 to its destination register anticipating a success.
             if (IS_AMO(PAY.buf[index].flags) && PAY.buf[index].C_valid) {
                assert(PAY.buf[index].C_log_reg != 0);  // if X0, would have cleared C_valid in Decode Stage
-               PAY.buf[index].C_value.dw = 0;
-               REN->set_ready(PAY.buf[index].C_phys_reg);
-               REN->write(PAY.buf[index].C_phys_reg, 0);
+               if(PAY.buf[index].predicted) {
+                  if(PAY.buf[index].prediction.dw != PAY.buf[index].C_value.dw){ 
+                     PAY.buf[index].C_value.dw = 0;
+                     REN->set_ready(PAY.buf[index].C_phys_reg);
+                     REN->write(PAY.buf[index].C_phys_reg, 0);
+                  }
+               }
+               else {
+                  PAY.buf[index].C_value.dw = 0;
+                  REN->set_ready(PAY.buf[index].C_phys_reg);
+                  REN->write(PAY.buf[index].C_phys_reg, 0);
+               }
+               if(PAY.buf[index].in_vpq)
+                  VP->vpq_deposit(PAY.buf[index].vpq_entry, PAY.buf[index].C_value.dw);
             }
          }
       }
@@ -138,8 +160,18 @@ void pipeline_t::execute(unsigned int lane_number) {
 	 // You don't have to decode the instruction, rather, just check the existence (validity) of a destination register.
 
          // FIX_ME #14 BEGIN
-         if(PAY.buf[index].C_valid)
-            REN->write(PAY.buf[index].C_phys_reg, PAY.buf[index].C_value.dw);
+         if(PAY.buf[index].C_valid) {
+            if(PAY.buf[index].predicted) {
+               if(PAY.buf[index].prediction.dw != PAY.buf[index].C_value.dw){
+                  REN->write(PAY.buf[index].C_phys_reg, PAY.buf[index].C_value.dw);
+               }
+            }
+            else {
+               REN->write(PAY.buf[index].C_phys_reg, PAY.buf[index].C_value.dw);
+            }
+            if(PAY.buf[index].in_vpq)
+               VP->vpq_deposit(PAY.buf[index].vpq_entry, PAY.buf[index].C_value.dw);
+         }
          // FIX_ME #14 END
       }
 
@@ -252,9 +284,21 @@ void pipeline_t::load_replay() {
          // 2. See #13 (in execute.cc), and implement steps 3a,3b,3c.
       
 	      // FIX_ME #18a BEGIN
-         IQ.wakeup(PAY.buf[index].C_phys_reg);
-         REN->set_ready(PAY.buf[index].C_phys_reg);
-         REN->write(PAY.buf[index].C_phys_reg, PAY.buf[index].C_value.dw);
+
+         if(PAY.buf[index].predicted) {
+            if(PAY.buf[index].prediction.dw != PAY.buf[index].C_value.dw){
+               IQ.wakeup(PAY.buf[index].C_phys_reg);
+               REN->set_ready(PAY.buf[index].C_phys_reg);
+               REN->write(PAY.buf[index].C_phys_reg, PAY.buf[index].C_value.dw);
+            }
+         }
+         else {
+            IQ.wakeup(PAY.buf[index].C_phys_reg);
+            REN->set_ready(PAY.buf[index].C_phys_reg);
+            REN->write(PAY.buf[index].C_phys_reg, PAY.buf[index].C_value.dw);
+         }
+         if(PAY.buf[index].in_vpq)
+            VP->vpq_deposit(PAY.buf[index].vpq_entry, PAY.buf[index].C_value.dw);
          // FIX_ME #18a END
       }
 

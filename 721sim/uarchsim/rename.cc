@@ -173,14 +173,20 @@ void pipeline_t::rename2() {
       if(enable) {
          if(eligible && vpq_size > 0 && !VP->stall_vpq(1)) {
             PAY.buf[index].vpq_entry = VP->vpq_allocate(PAY.buf[index].pc);
-            PAY.buf[index].prediction = VP->predict(PAY.buf[index].pc, PAY.buf[index].miss);
+            PAY.buf[index].in_vpq = true;
+            PAY.buf[index].prediction.dw = VP->predict(PAY.buf[index].pc, PAY.buf[index].miss);
             PAY.buf[index].confident = VP->get_confidence(PAY.buf[index].pc);
+            PAY.buf[index].predicted = true;
+            PAY.buf[index].in_drop = false;
+            PAY.buf[index].in_type = false;
          }
          else if(!eligible && !perf) {
             PAY.buf[index].in_type = true;
             PAY.buf[index].in_drop = false;
+            PAY.buf[index].predicted = false;
          }else if(VP->stall_vpq(1)){
             PAY.buf[index].in_drop = true;
+            PAY.buf[index].predicted = true;
          }
       }
 

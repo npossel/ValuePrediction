@@ -181,7 +181,7 @@ void pipeline_t::dispatch() {
          else if(eligible && !PAY.buf[index].miss && vpq_size > 0) {
             if(PAY.buf[index].confident){
                REN->set_ready(PAY.buf[index].C_phys_reg);
-               REN->write(PAY.buf[index].C_phys_reg, PAY.buf[index].prediction);
+               REN->write(PAY.buf[index].C_phys_reg, PAY.buf[index].prediction.dw);
             }
          }
          else {
