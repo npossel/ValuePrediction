@@ -15,7 +15,7 @@ public:
 class valuepredqueue {
 public:
     uint64_t PC = 0;
-    uint64_t val;
+    uint64_t val = 0;
 };
 class vp {
 private:

@@ -178,7 +178,6 @@ void pipeline_t::rename2() {
             printf("\n We are in the RENAME eligible if statement\n");
 
             PAY.buf[index].vpq_entry = VP->vpq_allocate(PAY.buf[index].pc);
-            PAY.buf[index].in_vpq = true;
             PAY.buf[index].prediction.dw = VP->predict(PAY.buf[index].pc, PAY.buf[index].miss);
             PAY.buf[index].confident = VP->get_confidence(PAY.buf[index].pc);
             PAY.buf[index].predicted = true;
@@ -190,21 +189,26 @@ void pipeline_t::rename2() {
             if(VP->get_oracle()) {
                printf("\n We are in the RENAME oracle if statement\n");
                actual = get_pipe()->peek(PAY.buf[index].db_index);
-               if(PAY.buf[index].prediction.dw == actual->a_rdst[0].value)
+               if(PAY.buf[index].prediction.dw == actual->a_rdst[0].value) {
                   PAY.buf[index].confident = true;
-               else
+               }
+               else {
                   PAY.buf[index].confident = false;
+               }
             }
          }
-         else if(!eligible && !perf) {
+         else if(!eligible) {
             printf("\n We are in the RENAME not eligible if statement\n");
             PAY.buf[index].in_type = true;
             PAY.buf[index].in_drop = false;
             PAY.buf[index].predicted = false;
+            PAY.buf[index].confident = false;
          }else if(VP->stall_vpq(1) && !perf){
             printf("\n We should not be in here right now\n");
             PAY.buf[index].in_drop = true;
-            PAY.buf[index].predicted = true;
+            PAY.buf[index].in_type = false;
+            PAY.buf[index].predicted = false;
+            PAY.buf[index].confident = false;
          }
       }
 

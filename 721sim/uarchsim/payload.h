@@ -192,7 +192,6 @@ typedef struct {
    bool miss;                   // flag for if the instruction missed in the SVP.
    bool in_type;                // flag for if the instruction is ineligible due to type
    bool in_drop;                // flag for if the instruction is ineligible due to being dropped.
-   bool in_vpq;                 // flag for if the instruction is in the vpq
    union64_t prediction;         // prediction value from the VPU
    uint64_t vpq_entry;          // VPQ entry number
 

@@ -85,8 +85,10 @@ void pipeline_t::retire(size_t& instret) {
 
 
          // TRAINING FOR VALUE PREDICTION
-         if(!VP->get_perf())
+         if(!VP->get_perf() && PAY.buf[PAY.head].predicted) {
+            printf("\nWE ARE IN TRAIN EEEEEE\n");
             VP->train(PAY.buf[PAY.head].pc, VP->get_vpqval(PAY.buf[PAY.head].vpq_entry));
+         }
 
 	 // If the committed instruction is a load or store, signal the LSU to commit its oldest load or store, respectively.
          if (load || store) {

@@ -171,6 +171,7 @@ void pipeline_t::dispatch() {
       eligible = VP->eligible(PAY.buf[index].flags);
       vpq_size = VP->get_size();
       if(enable) {
+         printf("\n We are in the DISPATCH enable\n");
          if(PAY.buf[index].good_instruction && PAY.buf[index].C_valid && !branch_flag && vp_perf) {
             // set prf ready bit and write perfect predicted value into prf
             actual = get_pipe()->peek(PAY.buf[index].db_index);
@@ -181,16 +182,15 @@ void pipeline_t::dispatch() {
             PAY.buf[index].in_type = false;
             PAY.buf[index].in_drop = false;
 
+            printf("\n We are in the DISPATCH perfect if statement\n");
          }
          else if(eligible && !PAY.buf[index].miss && vpq_size > 0) {
+            printf("\n We are in the DISPATCH eligible AND SVP if statement\n");
             if(PAY.buf[index].confident){
                REN->set_ready(PAY.buf[index].C_phys_reg);
                REN->write(PAY.buf[index].C_phys_reg, PAY.buf[index].prediction.dw);
+               printf("\n We are in the DISPATCH eligible AND confident for SVP if statement\n");
             }
-         }
-         else {
-            PAY.buf[index].in_type = true;
-            PAY.buf[index].confident = false;
          }
       }
 
