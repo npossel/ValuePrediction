@@ -49,7 +49,7 @@ void pipeline_t::rename1() {
 void pipeline_t::rename2() {
    unsigned int i;
    unsigned int index;
-   unsigned int bundle_dst, bundle_branch;
+   unsigned int bundle_dst, bundle_branch, bundle_instr;
    bool enable;
    bool vpq_size;
    bool eligible;
@@ -96,6 +96,10 @@ void pipeline_t::rename2() {
       if(PAY.buf[index].C_valid)
          bundle_dst++;
       // FIX_ME #1 END
+      // Count the number of eligible instructions to value predict
+      if(VP->eligible(PAY.buf[index].flags)){
+        bundle_instr++;
+      }
    }
 
    // FIX_ME #2
@@ -115,6 +119,10 @@ void pipeline_t::rename2() {
       return;
    // FIX_ME #2 END
 
+   // Stall if the policy is to stall and there aren't enough entries available
+   if(!VP->get_policy() && VP->stall_vpq(bundle_instr)){
+      return;
+   }
    //
    // Sufficient resources are available to rename the rename bundle.
    //
@@ -163,14 +171,16 @@ void pipeline_t::rename2() {
       perf = VP->get_perf();
       vpq_size = VP->get_size();
       if(enable) {
-         if(eligible && vpq_size > 0) {
+         if(eligible && vpq_size > 0 && !VP->stall_vpq(1)) {
             PAY.buf[index].vpq_entry = VP->vpq_allocate(PAY.buf[index].pc);
-            // implement stall/skip if the vpq is full
             PAY.buf[index].prediction = VP->predict(PAY.buf[index].pc, PAY.buf[index].miss);
             PAY.buf[index].confident = VP->get_confidence(PAY.buf[index].pc);
          }
          else if(!eligible && !perf) {
             PAY.buf[index].in_type = true;
+            PAY.buf[index].in_drop = false;
+         }else if(VP->stall_vpq(1)){
+            PAY.buf[index].in_drop = true;
          }
       }
 
