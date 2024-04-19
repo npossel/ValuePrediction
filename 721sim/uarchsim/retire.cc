@@ -86,7 +86,7 @@ void pipeline_t::retire(size_t& instret) {
 
          // TRAINING FOR VALUE PREDICTION
          if(!VP->get_perf() && PAY.buf[PAY.head].predicted) {
-            printf("\nWE ARE IN TRAIN EEEEEE\n");
+            printf("\n%X WE ARE IN TRAIN EEEEEE\n", PAY.buf[PAY.head].pc);
             VP->train(PAY.buf[PAY.head].pc, VP->get_vpqval(PAY.buf[PAY.head].vpq_entry));
          }
 

@@ -128,7 +128,7 @@ bool vp::eligible(unsigned int flags) {
       return(false);     // instr. is none of the above major types, so it is never eligible
 }
 
-uint64_t vp::predict(uint64_t PC, bool& miss) {
+uint64_t vp::predict(uint64_t PC) {
     uint64_t prediction;
     uint64_t index_n = (PC & ((1<<(index+2))-1))>>2;
     uint64_t tag_n = (PC & ((1<<(tag+index+2))-1))>>(index+2);
@@ -239,7 +239,7 @@ void vp::vpq_deposit(uint64_t index, uint64_t value) {
     vpq[index].val = value;
 }
 
-void squash(){
+void vp::squash(){
     vpq_t = vpq_h;
     vpq_tp = vpq_hp;
 }

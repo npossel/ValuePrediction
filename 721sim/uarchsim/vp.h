@@ -36,6 +36,8 @@ private:
     bool predLOAD;
     bool full_policy;
 
+    bool miss;
+
     unsigned int n_ineligible_type;
     unsigned int n_ineligible_drop;
 
@@ -120,13 +122,16 @@ public:
     uint64_t get_vpqval(uint64_t index) {return vpq[index].val;}
     
     // Get the prediction of the instruction
-    uint64_t predict(uint64_t PC, bool& miss);
+    uint64_t predict(uint64_t PC);
 
     // Train the stride value predictor
     void train(uint64_t PC, uint64_t val);
 
     // Get the VPQ full policy
     bool get_policy(){return full_policy;}
+
+    // Get miss flag
+    bool get_miss(){return miss;}
 
     // Allocate entry in VPQ
     uint64_t vpq_allocate(uint64_t PC);

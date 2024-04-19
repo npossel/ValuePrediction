@@ -74,24 +74,24 @@ void pipeline_t::execute(unsigned int lane_number) {
             // FIX_ME #13 BEGIN
             if(hit && PAY.buf[index].C_valid) {
                if(PAY.buf[index].predicted) {
-                  printf("in EXECUTE for loads I think\n");
+                  printf("%X in EXECUTE for loads I think\n", PAY.buf[index].pc);
                   if(PAY.buf[index].prediction.dw != PAY.buf[index].C_value.dw){ 
                      IQ.wakeup(PAY.buf[index].C_phys_reg);
                      REN->set_ready(PAY.buf[index].C_phys_reg);
                      REN->write(PAY.buf[index].C_phys_reg, PAY.buf[index].C_value.dw);
                      PAY.buf[index].correct = false;
-                     printf("LOAD: incorrect\n");
+                     printf("%X LOAD: incorrect\n", PAY.buf[index].pc);
                   }
                   else if (PAY.buf[index].prediction.dw == PAY.buf[index].C_value.dw && !PAY.buf[index].confident) {
                      IQ.wakeup(PAY.buf[index].C_phys_reg);
                      REN->set_ready(PAY.buf[index].C_phys_reg);
                      REN->write(PAY.buf[index].C_phys_reg, PAY.buf[index].C_value.dw);
                      PAY.buf[index].correct = true;
-                     printf("LOAD: unconfident correct\n");
+                     printf("%X LOAD: unconfident correct\n", PAY.buf[index].pc);
                   }
                   else if (PAY.buf[index].prediction.dw == PAY.buf[index].C_value.dw && PAY.buf[index].confident){
                      PAY.buf[index].correct = true;
-                     printf("LOAD: confident correct\n");
+                     printf("%X LOAD: confident correct\n", PAY.buf[index].pc);
                   }
                   VP->vpq_deposit(PAY.buf[index].vpq_entry, PAY.buf[index].C_value.dw);
                }
@@ -124,24 +124,24 @@ void pipeline_t::execute(unsigned int lane_number) {
             if (IS_AMO(PAY.buf[index].flags) && PAY.buf[index].C_valid) {
                assert(PAY.buf[index].C_log_reg != 0);  // if X0, would have cleared C_valid in Decode Stage
                if(PAY.buf[index].predicted) {
-                  printf("in EXECUTE for write\n");
+                  printf("%X in EXECUTE for write\n", PAY.buf[index].pc);
                   if(PAY.buf[index].prediction.dw != PAY.buf[index].C_value.dw){ 
                      PAY.buf[index].C_value.dw = 0;
                      REN->set_ready(PAY.buf[index].C_phys_reg);
                      REN->write(PAY.buf[index].C_phys_reg, 0);
                      PAY.buf[index].correct = false;
-                     printf("WRITE: incorrect\n");
+                     printf("%X WRITE: incorrect\n", PAY.buf[index].pc);
                   }
                   else if (PAY.buf[index].prediction.dw == PAY.buf[index].C_value.dw && !PAY.buf[index].confident) {
                      PAY.buf[index].C_value.dw = 0;
                      REN->set_ready(PAY.buf[index].C_phys_reg);
                      REN->write(PAY.buf[index].C_phys_reg, 0);
                      PAY.buf[index].correct = true;
-                     printf("WRITE: unconfident correct\n");
+                     printf("%X WRITE: unconfident correct\n", PAY.buf[index].pc);
                   }
                   else if (PAY.buf[index].prediction.dw == PAY.buf[index].C_value.dw && PAY.buf[index].confident){
                      PAY.buf[index].correct = true;
-                     printf("WRITE: confident correct\n");
+                     printf("%X WRITE: confident correct\n", PAY.buf[index].pc);
                   }
                   VP->vpq_deposit(PAY.buf[index].vpq_entry, PAY.buf[index].C_value.dw);
                }
@@ -188,20 +188,20 @@ void pipeline_t::execute(unsigned int lane_number) {
          // FIX_ME #14 BEGIN
          if(PAY.buf[index].C_valid) {
             if(PAY.buf[index].predicted) {
-               printf("In EXECUTE for the ALU instruction\n");
+               printf("%X In EXECUTE for the ALU instruction\n", PAY.buf[index].pc);
                if(PAY.buf[index].prediction.dw != PAY.buf[index].C_value.dw){
                   REN->write(PAY.buf[index].C_phys_reg, PAY.buf[index].C_value.dw);
                   PAY.buf[index].correct = false;
-                  printf("ALU: incorrect\n");
+                  printf("%X ALU: incorrect\n", PAY.buf[index].pc);
                }
                else if (PAY.buf[index].prediction.dw == PAY.buf[index].C_value.dw && !PAY.buf[index].confident) {
                   REN->write(PAY.buf[index].C_phys_reg, PAY.buf[index].C_value.dw);
                   PAY.buf[index].correct = true;
-                  printf("ALU: unconfident correct\n");
+                  printf("%X ALU: unconfident correct\n", PAY.buf[index].pc);
                }
                else if (PAY.buf[index].prediction.dw == PAY.buf[index].C_value.dw && PAY.buf[index].confident){
                   PAY.buf[index].correct = true;
-                  printf("ALU: confident correct\n");
+                  printf("%X ALU: confident correct\n", PAY.buf[index].pc);
                }
                VP->vpq_deposit(PAY.buf[index].vpq_entry, PAY.buf[index].C_value.dw);
             }
@@ -323,24 +323,24 @@ void pipeline_t::load_replay() {
 	      // FIX_ME #18a BEGIN
 
          if(PAY.buf[index].predicted) {
-            printf("in EXECUTE for replay stalled loads\n");
+            printf("%X  in EXECUTE for replay stalled loads\n", PAY.buf[index].pc);
             if(PAY.buf[index].prediction.dw != PAY.buf[index].C_value.dw){
                IQ.wakeup(PAY.buf[index].C_phys_reg);
                REN->set_ready(PAY.buf[index].C_phys_reg);
                REN->write(PAY.buf[index].C_phys_reg, PAY.buf[index].C_value.dw);
                PAY.buf[index].correct = false;
-               printf("LOAD REPLAY: incorrect\n");
+               printf("%X  LOAD REPLAY: incorrect\n", PAY.buf[index].pc);
             }
             else if (PAY.buf[index].prediction.dw == PAY.buf[index].C_value.dw && !PAY.buf[index].confident) {
                IQ.wakeup(PAY.buf[index].C_phys_reg);
                REN->set_ready(PAY.buf[index].C_phys_reg);
                REN->write(PAY.buf[index].C_phys_reg, PAY.buf[index].C_value.dw);
                PAY.buf[index].correct = true;
-               printf("LOAD REPLAY: unconfident correct\n");
+               printf("%X  LOAD REPLAY: unconfident correct\n", PAY.buf[index].pc);
             }
             else if (PAY.buf[index].prediction.dw == PAY.buf[index].C_value.dw && PAY.buf[index].confident) {
                PAY.buf[index].correct = true;
-               printf("LOAD REPLAY: confident correct\n");
+               printf("%X  LOAD REPLAY: confident correct\n", PAY.buf[index].pc);
             }
             VP->vpq_deposit(PAY.buf[index].vpq_entry, PAY.buf[index].C_value.dw);
          }

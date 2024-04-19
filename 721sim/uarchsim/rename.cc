@@ -175,11 +175,20 @@ void pipeline_t::rename2() {
       vpq_size = VP->get_size();
       if(enable) {
          if(eligible && vpq_size > 0 && !VP->stall_vpq(1)) {
-            printf("\n We are in the RENAME eligible if statement\n");
+            printf("\n%X We are in the RENAME eligible if statement\n", PAY.buf[index].pc);
 
             PAY.buf[index].vpq_entry = VP->vpq_allocate(PAY.buf[index].pc);
-            PAY.buf[index].prediction.dw = VP->predict(PAY.buf[index].pc, PAY.buf[index].miss);
+            printf("%X VPQ Entry: %lu\n", PAY.buf[index].pc, PAY.buf[index].vpq_entry);
+
+            PAY.buf[index].prediction.dw = VP->predict(PAY.buf[index].pc);
+            printf("%X Prediction: %lu\n", PAY.buf[index].pc, PAY.buf[index].prediction.dw);
+
+            PAY.buf[index].miss = VP->get_miss();
+            printf("%X Did it miss: \n", PAY.buf[index].pc, PAY.buf[index].miss);
+
             PAY.buf[index].confident = VP->get_confidence(PAY.buf[index].pc);
+            printf("%X Confident: %d\n", PAY.buf[index].pc, PAY.buf[index].confident);
+
             PAY.buf[index].predicted = true;
             PAY.buf[index].in_drop = false;
             PAY.buf[index].in_type = false;
@@ -187,18 +196,20 @@ void pipeline_t::rename2() {
             // Specifically for Oracle mode. If the prediction matches, it is confident, else it is not.
             // This allows for skipping of the recovery step
             if(VP->get_oracle()) {
-               printf("\n We are in the RENAME oracle if statement\n");
+               printf("\n%X We are in the RENAME oracle if statement\n", PAY.buf[index].pc);
                actual = get_pipe()->peek(PAY.buf[index].db_index);
-               if(PAY.buf[index].prediction.dw == actual->a_rdst[0].value) {
+               if(PAY.buf[index].prediction.dw == actual->a_rdst[0].value && !PAY.buf[index].miss) {
+                  printf("%X Prediction is right\n", PAY.buf[index].pc);
                   PAY.buf[index].confident = true;
                }
                else {
+                  printf("%X Prediction is wrong\n", PAY.buf[index].pc);
                   PAY.buf[index].confident = false;
                }
             }
          }
          else if(!eligible) {
-            printf("\n We are in the RENAME not eligible if statement\n");
+            printf("\n%X We are in the RENAME not eligible if statement\n", PAY.buf[index].pc);
             PAY.buf[index].in_type = true;
             PAY.buf[index].in_drop = false;
             PAY.buf[index].predicted = false;
