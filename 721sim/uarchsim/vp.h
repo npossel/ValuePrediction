@@ -115,6 +115,12 @@ public:
     // Get the prediction of the instruction
     uint64_t predict(uint64_t PC, bool& miss);
 
+    // Get the VPQ full policy
+    bool get_policy(){return full_policy;}
+
     // Allocate entry in VPQ
     uint64_t vpq_allocate(uint64_t PC);
+
+    // Stall VPQ if full policy is 0 and there aren't enough entries
+    bool stall_vpq(uint64_t bundle_instr);
 };

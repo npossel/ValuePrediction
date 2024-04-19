@@ -144,3 +144,17 @@ uint64_t vp::vpq_allocate(uint64_t PC) {
     }
     return vpq_t-1;
 }
+
+bool stall_vpq(uint64_t bundle_instr){
+    if(vpq_tp == vpq_hp){
+        if(n_size - (vpq_t - vpq_h) >= bundle_instr){
+            return false;
+        }
+        return true;
+    }
+
+    if(vpq_h - vpq_t >= bundle_instr){
+       return false;
+    }
+    return true;
+}
