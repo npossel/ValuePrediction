@@ -16,7 +16,9 @@ void pipeline_t::dispatch() {
    bool B_ready;
    bool D_ready;
    bool enable;
+   bool eligible;
    bool vp_perf;
+   uint64_t vpq_size;
    db_t* actual;
 
    // Stall the Dispatch Stage if either:
@@ -166,6 +168,7 @@ void pipeline_t::dispatch() {
 
       enable = VP->get_enable();
       vp_perf = VP->get_perf();
+      eligible = VP->eligible(PAY.buf[index].flags);
       if(enable) {
          if(PAY.buf[index].good_instruction && PAY.buf[index].C_valid && !branch_flag && vp_perf) {
             // set prf ready bit and write perfect predicted value into prf
@@ -174,6 +177,12 @@ void pipeline_t::dispatch() {
             REN->write(PAY.buf[index].C_phys_reg, actual->a_rdst[0].value);
             PAY.buf[index].confident = true;
             PAY.buf[index].correct = true;
+         }
+         else if(eligible && !PAY.buf[index].miss && vpq_size > 0) {
+            if(PAY.buf[index].confident){
+               REN->set_ready(PAY.buf[index].C_phys_reg);
+               REN->write(PAY.buf[index].C_phys_reg, PAY.buf[index].prediction);
+            }
          }
          else {
             PAY.buf[index].in_type = true;
