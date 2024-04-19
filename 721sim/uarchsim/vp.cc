@@ -225,3 +225,8 @@ bool vp::stall_vpq(uint64_t bundle_instr){
 void vp::vpq_deposit(uint64_t index, uint64_t value) {
         vpq[index].val = value;
 }
+
+void squash(){
+    vpq_t = vpq_h;
+    vpq_tp = vpq_hp;
+}

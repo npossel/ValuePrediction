@@ -50,9 +50,9 @@ private:
     
     std::vector<valuepredqueue> vpq;
     uint64_t vpq_h = 0;
-    bool vpq_hp = 0;
+    bool vpq_hp = false;
     uint64_t vpq_t = 0;
-    bool vpq_tp = 0;
+    bool vpq_tp = false;
 public:
     // This is the constructor for the value predictor
     vp(bool n_enable,
@@ -139,4 +139,7 @@ public:
 
     // print debug
     void debug(FILE* fp, uint64_t count);
+
+    // Full squash the vpq
+    void squash();
 };
