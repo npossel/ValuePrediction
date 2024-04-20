@@ -91,13 +91,33 @@ void vp::vp_stats(uint64_t num_instr, FILE* fp) {
             100.0*(double)n_unconf_incorr/(double)num_instr);
 }
 
-void vp::debug(FILE* fp, uint64_t count) {
+void vp::debugSVP(FILE* fp, uint64_t count) {
     fprintf(fp, "-------- DEBUG: retired instruction count = %lu\n", count);
     fprintf(fp, "SVP entry #:   tag(hex)   conf   retired_value   stride   instance\n");
     for(int i = 0; i < svp.size(); i++){
-        fprintf(fp, "%11d:%11X%7lu%16lu%9d%11lu\n", i, svp[i].tag, svp[i].conf, svp[i].retired_value, svp[i].stride, svp[i].instance);
+        fprintf(fp, "%11d: %10lx %6lu %15lu %8ld %10lu\n", i, svp[i].tag, svp[i].conf, svp[i].retired_value, svp[i].stride, svp[i].instance);
     }
     fprintf(fp, "\n");
+}
+
+void vp::debugVPQ(FILE* fp) {
+    bool j = true;
+    uint64_t i = vpq_h;
+    uint64_t index_n;
+    uint64_t tag_n;
+
+    fprintf(fp, "VPQ entry #:   PC(hex)   PCtag(hex)   PCindex(hex)\n");
+    while(j) {
+        index_n = (vpq[i].PC & ((1<<(index+2))-1))>>2;
+        tag_n = (vpq[i].PC & ((1<<(tag+index+2))-1))>>(index+2);
+
+        fprintf(fp, "%11lu: %9lx %12lx %14lx\n", i, vpq[i].PC, tag_n, index_n);
+        i++;
+        if(i == size)
+            i = 0;
+        if(i == vpq_t)
+            j = false;
+    }
 }
 
 // Search the SVP using the PC tag (if there is one) and check confidence.
@@ -134,6 +154,7 @@ uint64_t vp::predict(uint64_t PC) {
     uint64_t tag_n = (PC & ((1<<(tag+index+2))-1))>>(index+2);
 
     if(svp[index_n].tag == tag_n || tag==0) {
+        miss = false;
         svp[index_n].instance++;
         prediction = svp[index_n].retired_value + (svp[index_n].instance * svp[index_n].stride);
         return prediction;
@@ -144,6 +165,20 @@ uint64_t vp::predict(uint64_t PC) {
     }
 }
 
+bool vp::get_miss(uint64_t PC) {
+    uint64_t prediction;
+    uint64_t index_n = (PC & ((1<<(index+2))-1))>>2;
+    uint64_t tag_n = (PC & ((1<<(tag+index+2))-1))>>(index+2);
+
+    if(svp[index_n].tag == tag_n || tag==0) {
+        miss = false;
+    }
+    else {
+        miss = true;
+    }
+    return miss;
+}
+
 void vp::train(uint64_t PC, uint64_t val) {
     uint64_t index_n = (PC & ((1<<(index+2))-1))>>2;
     uint64_t tag_n = (PC & ((1<<(tag+index+2))-1))>>(index+2);
@@ -152,9 +187,9 @@ void vp::train(uint64_t PC, uint64_t val) {
     uint64_t i;
     bool j = true;
 
-    printf("Index in SVP: %d\n", index_n);
-    printf("Tag of SVP: %X\n", svp[index_n].tag);
-    printf("Tag of instruction: %X\n", tag_n);
+    printf("Index in SVP: %lu\n", index_n);
+    printf("Tag of SVP: %lx\n", svp[index_n].tag);
+    printf("Tag of instruction: %lx\n", tag_n);
     if(svp[index_n].tag == tag_n || tag==0) {
         printf("TAGS MATCH IN THE TRAIN\n");
         new_stride = val-svp[index_n].retired_value;

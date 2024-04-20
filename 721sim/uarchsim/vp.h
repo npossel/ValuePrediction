@@ -8,7 +8,7 @@ public:
     uint64_t tag = 0;
     uint64_t conf = 0;
     uint64_t retired_value = 0;
-    int stride = 0;
+    int64_t stride = 0;
     uint64_t instance = 0;
 };
 
@@ -131,7 +131,7 @@ public:
     bool get_policy(){return full_policy;}
 
     // Get miss flag
-    bool get_miss(){return miss;}
+    bool get_miss(uint64_t PC);
 
     // Allocate entry in VPQ
     uint64_t vpq_allocate(uint64_t PC);
@@ -143,7 +143,8 @@ public:
     void vpq_deposit(uint64_t index, uint64_t value);
 
     // print debug
-    void debug(FILE* fp, uint64_t count);
+    void debugSVP(FILE* fp, uint64_t count);
+    void debugVPQ(FILE* fp);
 
     // Full squash the vpq
     void squash();
