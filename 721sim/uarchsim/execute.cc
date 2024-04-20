@@ -74,6 +74,9 @@ void pipeline_t::execute(unsigned int lane_number) {
             // FIX_ME #13 BEGIN
             if(hit && PAY.buf[index].C_valid) {
                if(PAY.buf[index].predicted) {
+                  printf("\n%lx EXECUTE LOAD predicted value: %lu", PAY.buf[index].pc, PAY.buf[index].prediction.dw);
+                  printf("\n%lx EXECUTE LOAD actual value: %lu\n", PAY.buf[index].pc, PAY.buf[index].C_value.dw);
+
                   printf("%lx in EXECUTE for loads I think\n", PAY.buf[index].pc);
                   if(PAY.buf[index].prediction.dw != PAY.buf[index].C_value.dw){ 
                      IQ.wakeup(PAY.buf[index].C_phys_reg);
@@ -93,13 +96,14 @@ void pipeline_t::execute(unsigned int lane_number) {
                      PAY.buf[index].correct = true;
                      printf("%lx LOAD: confident correct\n", PAY.buf[index].pc);
                   }
-                  VP->vpq_deposit(PAY.buf[index].vpq_entry, PAY.buf[index].C_value.dw);
                }
                else {
                   IQ.wakeup(PAY.buf[index].C_phys_reg);
                   REN->set_ready(PAY.buf[index].C_phys_reg);
                   REN->write(PAY.buf[index].C_phys_reg, PAY.buf[index].C_value.dw);
                }
+               if (PAY.buf[index].in_vpq)
+                  VP->vpq_deposit(PAY.buf[index].vpq_entry, PAY.buf[index].C_value.dw);
             }
             // FIX_ME #13 END
          }
@@ -124,6 +128,9 @@ void pipeline_t::execute(unsigned int lane_number) {
             if (IS_AMO(PAY.buf[index].flags) && PAY.buf[index].C_valid) {
                assert(PAY.buf[index].C_log_reg != 0);  // if X0, would have cleared C_valid in Decode Stage
                if(PAY.buf[index].predicted) {
+                  printf("\n%lx EXECUTE STORE predicted value: %lu", PAY.buf[index].pc, PAY.buf[index].prediction.dw);
+                  printf("\n%lx EXECUTE STORE actual value: %lu\n", PAY.buf[index].pc, PAY.buf[index].C_value.dw);
+
                   printf("%lx in EXECUTE for write\n", PAY.buf[index].pc);
                   if(PAY.buf[index].prediction.dw != PAY.buf[index].C_value.dw){ 
                      PAY.buf[index].C_value.dw = 0;
@@ -143,13 +150,14 @@ void pipeline_t::execute(unsigned int lane_number) {
                      PAY.buf[index].correct = true;
                      printf("%lx WRITE: confident correct\n", PAY.buf[index].pc);
                   }
-                  VP->vpq_deposit(PAY.buf[index].vpq_entry, PAY.buf[index].C_value.dw);
                }
                else {
                   PAY.buf[index].C_value.dw = 0;
                   REN->set_ready(PAY.buf[index].C_phys_reg);
                   REN->write(PAY.buf[index].C_phys_reg, 0);
                }
+               if (PAY.buf[index].in_vpq)
+                  VP->vpq_deposit(PAY.buf[index].vpq_entry, PAY.buf[index].C_value.dw);
             }
          }
       }
@@ -188,6 +196,9 @@ void pipeline_t::execute(unsigned int lane_number) {
          // FIX_ME #14 BEGIN
          if(PAY.buf[index].C_valid) {
             if(PAY.buf[index].predicted) {
+               printf("\n%lx EXECUTE ALU predicted value: %lu", PAY.buf[index].pc, PAY.buf[index].prediction.dw);
+               printf("\n%lx EXECUTE ALU actual value: %lu\n", PAY.buf[index].pc, PAY.buf[index].C_value.dw);
+
                printf("%lx In EXECUTE for the ALU instruction\n", PAY.buf[index].pc);
                if(PAY.buf[index].prediction.dw != PAY.buf[index].C_value.dw){
                   REN->write(PAY.buf[index].C_phys_reg, PAY.buf[index].C_value.dw);
@@ -203,11 +214,12 @@ void pipeline_t::execute(unsigned int lane_number) {
                   PAY.buf[index].correct = true;
                   printf("%lx ALU: confident correct\n", PAY.buf[index].pc);
                }
-               VP->vpq_deposit(PAY.buf[index].vpq_entry, PAY.buf[index].C_value.dw);
             }
             else {
                REN->write(PAY.buf[index].C_phys_reg, PAY.buf[index].C_value.dw);
             }
+            if (PAY.buf[index].in_vpq)
+               VP->vpq_deposit(PAY.buf[index].vpq_entry, PAY.buf[index].C_value.dw);
          }
          // FIX_ME #14 END
       }
@@ -323,6 +335,9 @@ void pipeline_t::load_replay() {
 	      // FIX_ME #18a BEGIN
 
          if(PAY.buf[index].predicted) {
+            printf("\n%lx EXECUTE REPLAY predicted value: %lu", PAY.buf[index].pc, PAY.buf[index].prediction.dw);
+            printf("\n%lx EXECUTE REPLAY actual value: %lu\n", PAY.buf[index].pc, PAY.buf[index].C_value.dw);
+
             printf("%lx  in EXECUTE for replay stalled loads\n", PAY.buf[index].pc);
             if(PAY.buf[index].prediction.dw != PAY.buf[index].C_value.dw){
                IQ.wakeup(PAY.buf[index].C_phys_reg);
@@ -342,13 +357,14 @@ void pipeline_t::load_replay() {
                PAY.buf[index].correct = true;
                printf("%lx  LOAD REPLAY: confident correct\n", PAY.buf[index].pc);
             }
-            VP->vpq_deposit(PAY.buf[index].vpq_entry, PAY.buf[index].C_value.dw);
          }
          else {
             IQ.wakeup(PAY.buf[index].C_phys_reg);
             REN->set_ready(PAY.buf[index].C_phys_reg);
             REN->write(PAY.buf[index].C_phys_reg, PAY.buf[index].C_value.dw);
          }
+         if (PAY.buf[index].in_vpq)
+            VP->vpq_deposit(PAY.buf[index].vpq_entry, PAY.buf[index].C_value.dw);
          // FIX_ME #18a END
       }
 

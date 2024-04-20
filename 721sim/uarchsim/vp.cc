@@ -153,18 +153,12 @@ uint64_t vp::predict(uint64_t PC) {
     uint64_t index_n = (PC & ((1<<(index+2))-1))>>2;
     uint64_t tag_n = (PC & ((1<<(tag+index+2))-1))>>(index+2);
 
-    if(svp[index_n].tag == tag_n || tag==0) {
-        svp[index_n].instance++;
-        prediction = svp[index_n].retired_value + (svp[index_n].instance * svp[index_n].stride);
-        return prediction;
-    }
-    else {
-        return 0;
-    }
+    svp[index_n].instance++;
+    prediction = svp[index_n].retired_value + (svp[index_n].instance * svp[index_n].stride);
+    return prediction;
 }
 
 bool vp::get_miss(uint64_t PC) {
-    uint64_t prediction;
     uint64_t index_n = (PC & ((1<<(index+2))-1))>>2;
     uint64_t tag_n = (PC & ((1<<(tag+index+2))-1))>>(index+2);
 

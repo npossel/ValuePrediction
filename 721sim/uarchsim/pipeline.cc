@@ -570,6 +570,7 @@ bool pipeline_t::step_micro(size_t instret_limit, size_t& instret)
 
         size_t lane_number;
 
+        // usleep(50000);
         if((stats->get_counter("commit_count"))%1000==0 && stats->get_counter("commit_count")>0) {
           VP->debugSVP(stats_log, stats->get_counter("commit_count"));
           VP->debugVPQ(stats_log);

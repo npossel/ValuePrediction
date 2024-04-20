@@ -187,6 +187,7 @@ typedef struct {
 
    // Value prediction
    bool predicted;              // flag for if the value was predicted
+   bool in_vpq;                  // flag for if the instruction is in the vpq
    bool confident;              // flag for if the value is predicted confident.
    bool correct;                // flag for if the value is correct or not.
    bool miss;                   // flag for if the instruction missed in the SVP.

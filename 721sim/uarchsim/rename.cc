@@ -180,17 +180,20 @@ void pipeline_t::rename2() {
 
             PAY.buf[index].vpq_entry = VP->vpq_allocate(PAY.buf[index].pc);
             printf("%lx VPQ Entry: %lu\n", PAY.buf[index].pc, PAY.buf[index].vpq_entry);
-
-            PAY.buf[index].prediction.dw = VP->predict(PAY.buf[index].pc);
-            printf("%lx Prediction: %lu\n", PAY.buf[index].pc, PAY.buf[index].prediction.dw);
+            PAY.buf[index].in_vpq = true;
 
             PAY.buf[index].miss = VP->get_miss(PAY.buf[index].pc);
             printf("%lx Did it miss: %d\n", PAY.buf[index].pc, PAY.buf[index].miss);
 
+            if(PAY.buf[index].miss == false) {
+               PAY.buf[index].prediction.dw = VP->predict(PAY.buf[index].pc);
+               printf("%lx Prediction: %lu\n", PAY.buf[index].pc, PAY.buf[index].prediction.dw);
+               PAY.buf[index].predicted = true;
+            }
+
             PAY.buf[index].confident = VP->get_confidence(PAY.buf[index].pc);
             printf("%lx Confident: %d\n", PAY.buf[index].pc, PAY.buf[index].confident);
 
-            PAY.buf[index].predicted = true;
             PAY.buf[index].in_drop = false;
             PAY.buf[index].in_type = false;
 
@@ -199,6 +202,10 @@ void pipeline_t::rename2() {
             if(VP->get_oracle()) {
                printf("\n%lx We are in the RENAME oracle if statement\n", PAY.buf[index].pc);
                actual = get_pipe()->peek(PAY.buf[index].db_index);
+
+               printf("\n%lx RENAME predicted value: %lu", PAY.buf[index].pc, PAY.buf[index].prediction.dw);
+               printf("\n%lx RENAME actual value: %lu\n", PAY.buf[index].pc, actual->a_rdst[0].value);
+
                if(PAY.buf[index].prediction.dw == actual->a_rdst[0].value && !PAY.buf[index].miss) {
                   printf("%lx Prediction is right\n", PAY.buf[index].pc);
                   PAY.buf[index].confident = true;
