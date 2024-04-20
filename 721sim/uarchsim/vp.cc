@@ -127,7 +127,7 @@ bool vp::get_confidence(uint64_t PC) {
     uint64_t index_n = (PC & ((1<<(index+2))-1))>>2;
     uint64_t tag_n = (PC & ((1<<(tag+index+2))-1))>>(index+2);
 
-    if(svp[index_n].conf == confmax && (svp[index_n].tag == tag_n || tag==0))
+    if((svp[index_n].tag == tag_n || tag==0) && svp[index_n].conf == confmax)
         return true;
     else
         return false;
@@ -154,13 +154,11 @@ uint64_t vp::predict(uint64_t PC) {
     uint64_t tag_n = (PC & ((1<<(tag+index+2))-1))>>(index+2);
 
     if(svp[index_n].tag == tag_n || tag==0) {
-        miss = false;
         svp[index_n].instance++;
         prediction = svp[index_n].retired_value + (svp[index_n].instance * svp[index_n].stride);
         return prediction;
     }
     else {
-        miss = true;
         return 0;
     }
 }
@@ -223,6 +221,7 @@ void vp::train(uint64_t PC, uint64_t val) {
         svp[index_n].conf = 0;
         svp[index_n].retired_value = val;
         svp[index_n].stride = val;
+
         i = vpq_h+1;
         if(i == size)
             i = 0;
@@ -233,7 +232,7 @@ void vp::train(uint64_t PC, uint64_t val) {
             i++;
             if(i == size)
                 i = 0;
-            if(i == vpq_t + 1)
+            if(i == vpq_t)
                 j = false;
         }
     }
@@ -271,6 +270,8 @@ bool vp::stall_vpq(uint64_t bundle_instr){
 }
 
 void vp::vpq_deposit(uint64_t index, uint64_t value) {
+    printf("Index in deposit: %lu\n", index);
+    printf("Value in deposit: %lu\n", value);
     vpq[index].val = value;
 }
 
