@@ -111,7 +111,7 @@ void vp::debugVPQ(FILE* fp) {
         index_n = (vpq[i].PC & ((1<<(index+2))-1))>>2;
         tag_n = (vpq[i].PC & ((1<<(tag+index+2))-1))>>(index+2);
 
-        fprintf(fp, "%11lu: %9lx %12lx %14lx\n", i, vpq[i].PC, tag_n, index_n);
+        fprintf(fp, "%11lu: %9lx %12lx %14lu\n", i, vpq[i].PC, tag_n, index_n);
         i++;
         if(i == size)
             i = 0;
@@ -206,7 +206,7 @@ void vp::train(uint64_t PC, uint64_t val) {
                 svp[index_n].conf = 0;
         }
         svp[index_n].retired_value = val;
-        if(svp[index_n].instance != 0)
+        if(svp[index_n].instance > 0)
             svp[index_n].instance--;
 
         // printf("SVP conf: %lu\n", svp[index_n].conf);
@@ -292,17 +292,11 @@ void vp::vpq_deposit(uint64_t index, uint64_t value) {
 }
 
 void vp::squash(){
+    printf("\nWe are in the squash of the vpq!!\n");
    uint64_t index_n;
    uint64_t tag_n;
-   int check = vpq_h;
 
-   if(check == 0){
-       check = size - 1;
-   }else{
-       check--;
-   }
-
-   while(vpq_t != check){
+   while(vpq_t != vpq_h){
        if(vpq_t == 0){
            vpq_t = size - 1;
        }else{
@@ -318,9 +312,9 @@ void vp::squash(){
            }
        }
    }
-
-   vpq_t = vpq_h;
    vpq_tp = vpq_hp;
+
+   assert(vpq_h == vpq_t);
 }
 
 void vp::cost(){
@@ -340,13 +334,19 @@ void vp::cost(){
 }
 
 void vp::restore(uint64_t tail, bool t_phase){
-    printf("Checkpointed Tail: %lu\n", tail);
-    printf("Checpointed Phase: %d\n", t_phase);
+    // printf("\nCheckpointed Tail: %lu\n", tail);
+    // printf("Checkpointed Phase: %d\n", t_phase);
+    // printf("Current Tail pointer: %lu\n", vpq_t);
+    // printf("Current Tail Phase: %d\n", vpq_tp);
+    // printf("Current Head pointer: %lu\n", vpq_h);
+    // printf("Current Head Phase: %d\n", vpq_hp);
 
    vpq_tp = t_phase;
 
    uint64_t index_n;
    uint64_t tag_n;
+   bool j = true;
+   uint64_t i = vpq_h;
 
    while(vpq_t != tail){
        if(vpq_t == 0){
@@ -358,10 +358,19 @@ void vp::restore(uint64_t tail, bool t_phase){
        index_n = (vpq[vpq_t].PC & ((1<<(index+2))-1))>>2;
        tag_n = (vpq[vpq_t].PC & ((1<<(tag+index+2))-1))>>(index+2);
 
-       if(svp[index_n].tag == tag_n){
+       if(svp[index_n].tag == tag_n || tag == 0){
            if(svp[index_n].instance > 0){
                svp[index_n].instance--;
+            //    printf("%lx instance: %lu\n", vpq[vpq_t].PC, svp[index_n].instance);
            }
        }
    }
+//    while(j) {
+//         printf("%lu: %lx\n", i, vpq[i].PC);
+//         i++;
+//         if(i == size)
+//             i = 0;
+//         if(i == vpq_t)
+//             j = false;
+//     }
 }

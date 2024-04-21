@@ -120,6 +120,11 @@ void pipeline_t::retire(size_t& instret) {
             instret++;
 	    inc_counter(commit_count);
 
+      if((stats->get_counter("commit_count"))%1000==0) {
+         VP->debugSVP(stats_log, stats->get_counter("commit_count"));
+         VP->debugVPQ(stats_log);
+      }
+
       // increment value prediction counter
        if(PAY.buf[PAY.head].in_type)
          VP->inc_ineligible_type();

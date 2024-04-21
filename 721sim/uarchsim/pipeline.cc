@@ -426,10 +426,6 @@ pipeline_t::pipeline_t(
 pipeline_t::~pipeline_t()
 {
   //stats->dump_knobs();
-  // if((stats->get_counter("commit_count"))%1000==0 && stats->get_counter("commit_count")>0) {
-  //     VP->debugSVP(stats_log, stats->get_counter("commit_count"));
-  //     VP->debugVPQ(stats_log);
-  //   }
 
   stats->dump_counters();
   stats->update_rates();	// Need to call this before dump_rates() to ensure most up-to-date rates.
@@ -571,10 +567,6 @@ bool pipeline_t::step_micro(size_t instret_limit, size_t& instret)
         size_t lane_number;
 
         // usleep(50000);
-        // if((stats->get_counter("commit_count"))%1000==0 && stats->get_counter("commit_count")>0) {
-        //   VP->debugSVP(stats_log, stats->get_counter("commit_count"));
-        //   VP->debugVPQ(stats_log);
-        // }
 
         unsigned int prev_commit_count = counter(commit_count);
         for (lane_number = 0; lane_number < RETIRE_WIDTH; lane_number++) {
