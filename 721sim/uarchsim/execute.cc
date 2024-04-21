@@ -116,6 +116,10 @@ void pipeline_t::execute(unsigned int lane_number) {
                      PAY.buf[index].correct = true;
                      // printf("%lx LOAD: confident correct\n", PAY.buf[index].pc);
                   }
+
+                  if(!PAY.buf[index].correct && PAY.buf[index].confident){
+                      REN->set_value_misprediction(PAY.buf[index].AL_index);
+                  }
                }
                else {
                   IQ.wakeup(PAY.buf[index].C_phys_reg);
@@ -190,6 +194,9 @@ void pipeline_t::execute(unsigned int lane_number) {
                   else if (PAY.buf[index].prediction.dw == PAY.buf[index].C_value.dw && PAY.buf[index].confident){
                      PAY.buf[index].correct = true;
                      // printf("%lx WRITE: confident correct\n", PAY.buf[index].pc);
+                  }
+                  if(!PAY.buf[index].correct && PAY.buf[index].confident){
+                      REN->set_value_misprediction(PAY.buf[index].AL_index);
                   }
                }
                else {
@@ -272,6 +279,9 @@ void pipeline_t::execute(unsigned int lane_number) {
                else if (PAY.buf[index].prediction.dw == PAY.buf[index].C_value.dw && PAY.buf[index].confident){
                   PAY.buf[index].correct = true;
                   // printf("%lx ALU: confident correct\n", PAY.buf[index].pc);
+               }
+               if(!PAY.buf[index].correct && PAY.buf[index].confident){
+                   REN->set_value_misprediction(PAY.buf[index].AL_index);
                }
             }
             else {

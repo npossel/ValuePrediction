@@ -331,7 +331,7 @@ void vp::vpq_deposit(uint64_t index, uint64_t value) {
 }
 
 void vp::squash(){
-    printf("\nWe are in the squash of the vpq!!\n");
+//    printf("\nWe are in the squash of the vpq!!\n");
    uint64_t index_n;
    uint64_t tag_n;
     
@@ -420,7 +420,7 @@ void vp::restore(uint64_t tail, bool t_phase){
     // printf("Current Tail Phase: %d\n", vpq_tp);
     // printf("Current Head pointer: %lu\n", vpq_h);
     // printf("Current Head Phase: %d\n", vpq_hp);
-    printf("\nWe are in restore\n");
+//    printf("\nWe are in restore\n");
 
    vpq_tp = t_phase;
 
