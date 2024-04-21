@@ -134,7 +134,6 @@ void pipeline_t::rename2() {
 
    // Stall if the policy is to stall and there aren't enough entries available
    if(!perf && !VP->get_policy() && VP->stall_vpq(bundle_instr)){
-//      printf("\n what is bundle %d and head %lu and tail %lu and tp %d and hp %d\n", bundle_instr, VP->get_head(), VP->get_tail(), VP->get_tail_phase(), VP->get_head_phase());
       return;
    }
    //
@@ -185,7 +184,6 @@ void pipeline_t::rename2() {
       vpq_size = VP->get_size();
       if(enable && !perf) {
          if(eligible && VP->get_policy() && VP->stall_vpq(1)){
-//            printf("\n We should not be in here right now\n");
             PAY.buf[index].in_drop = true;
             PAY.buf[index].in_type = false;
             PAY.buf[index].miss = false;
@@ -194,18 +192,16 @@ void pipeline_t::rename2() {
             PAY.buf[index].confident = false;
             PAY.buf[index].in_vpq = false;
          }else if(eligible && vpq_size > 0) {
-            // printf("\n%lx We are in the RENAME eligible if statement\n", PAY.buf[index].pc);
-
+            // Allocate vpq entry
             PAY.buf[index].vpq_entry = VP->vpq_allocate(PAY.buf[index].pc);
-            // printf("%lx VPQ Entry: %lu\n", PAY.buf[index].pc, PAY.buf[index].vpq_entry);
             PAY.buf[index].in_vpq = true;
 
+            // Check if instr misses SVP
             PAY.buf[index].miss = VP->get_miss(PAY.buf[index].pc);
-            // printf("%lx Did it miss: %d\n", PAY.buf[index].pc, PAY.buf[index].miss);
 
+            // Predict instructions that do not miss
             if(PAY.buf[index].miss == false) {
                PAY.buf[index].prediction.dw = VP->predict(PAY.buf[index].pc);
-               // printf("%lx Prediction: %lu\n", PAY.buf[index].pc, PAY.buf[index].prediction.dw);
                PAY.buf[index].predicted = true;
                PAY.buf[index].confident = VP->get_confidence(PAY.buf[index].pc);
             }
@@ -215,7 +211,8 @@ void pipeline_t::rename2() {
                PAY.buf[index].confident = false;
             }
 
-            // printf("%lx Confident: %d\n", PAY.buf[index].pc, PAY.buf[index].confident);
+            // Get confidence of prediction
+            PAY.buf[index].confident = VP->get_confidence(PAY.buf[index].pc);
 
             PAY.buf[index].in_drop = false;
             PAY.buf[index].in_type = false;
@@ -223,19 +220,12 @@ void pipeline_t::rename2() {
             // Specifically for Oracle mode. If the prediction matches, it is confident, else it is not.
             // This allows for skipping of the recovery step
             if(VP->get_oracle()) {
-               // printf("\n%lx We are in the RENAME oracle if statement\n", PAY.buf[index].pc);
                actual = get_pipe()->peek(PAY.buf[index].db_index);
 
-               // printf("\n%lx RENAME predicted value: %lu", PAY.buf[index].pc, PAY.buf[index].prediction.dw);
-               // printf("\n%lx RENAME actual value: %lu", PAY.buf[index].pc, actual->a_rdst[0].value);
-               // printf("\n%lx VPQ Index: %lu\n", PAY.buf[index].pc, PAY.buf[index].vpq_entry);
-
                if(PAY.buf[index].prediction.dw == actual->a_rdst[0].value && !PAY.buf[index].miss) {
-                  // printf("%lx Prediction is right\n", PAY.buf[index].pc);
                   PAY.buf[index].confident = true;
                }
                else {
-                  // printf("%lx Prediction is wrong\n", PAY.buf[index].pc);
                   PAY.buf[index].confident = false;
                }
             }
