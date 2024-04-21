@@ -174,7 +174,7 @@ bool vp::get_miss(uint64_t PC) {
 void vp::train(uint64_t PC, uint64_t val) {
     uint64_t index_n = (PC & ((1<<(index+2))-1))>>2;
     uint64_t tag_n = (PC & ((1<<(tag+index+2))-1))>>(index+2);
-    uint64_t new_stride;
+    int64_t new_stride;
     uint64_t tmp_tail;
     uint64_t i;
     bool j = true;
