@@ -292,35 +292,35 @@ void vp::vpq_deposit(uint64_t index, uint64_t value) {
 }
 
 void vp::squash(){
-//    uint64_t index_n;
-//    uint64_t tag_n;
-//    int check = vpq_h;
-//
-//    if(check == 0){
-//        check = size - 1;
-//    }else{
-//        check--;
-//    }
-//
-//    while(vpq_t != check){
-//        if(vpq_t == 0){
-//            vpq_t = size - 1;
-//        }else{
-//            --vpq_t;
-//        }
-//
-//        index_n = (vpq[vpq_t].PC & ((1<<(index+2))-1))>>2;
-//        tag_n = (vpq[vpq_t].PC & ((1<<(tag+index+2))-1))>>(index+2);
-//
-//        if(svp[index_n].tag == tag_n){
-//            if(svp[index_n].instance > 0){
-//                svp[index_n].instance--;
-//            }
-//        }
-//    }
-//
-//    vpq_t = vpq_h;
-//    vpq_tp = vpq_hp;
+   uint64_t index_n;
+   uint64_t tag_n;
+   int check = vpq_h;
+
+   if(check == 0){
+       check = size - 1;
+   }else{
+       check--;
+   }
+
+   while(vpq_t != check){
+       if(vpq_t == 0){
+           vpq_t = size - 1;
+       }else{
+           --vpq_t;
+       }
+
+       index_n = (vpq[vpq_t].PC & ((1<<(index+2))-1))>>2;
+       tag_n = (vpq[vpq_t].PC & ((1<<(tag+index+2))-1))>>(index+2);
+
+       if(svp[index_n].tag == tag_n){
+           if(svp[index_n].instance > 0){
+               svp[index_n].instance--;
+           }
+       }
+   }
+
+   vpq_t = vpq_h;
+   vpq_tp = vpq_hp;
 }
 
 void vp::cost(){
@@ -340,25 +340,28 @@ void vp::cost(){
 }
 
 void vp::restore(uint64_t tail, bool t_phase){
-//    vpq_tp = t_phase;
-//
-//    uint64_t index_n;
-//    uint64_t tag_n;
-//
-//    while(vpq_t != tail){
-//        if(vpq_t == 0){
-//            vpq_t = size - 1;
-//        }else{
-//            --vpq_t;
-//        }
-//
-//        index_n = (vpq[vpq_t].PC & ((1<<(index+2))-1))>>2;
-//        tag_n = (vpq[vpq_t].PC & ((1<<(tag+index+2))-1))>>(index+2);
-//
-//        if(svp[index_n].tag == tag_n){
-//            if(svp[index_n].instance > 0){
-//                svp[index_n].instance--;
-//            }
-//        }
-//    }
+    printf("Checkpointed Tail: %lu\n", tail);
+    printf("Checpointed Phase: %d\n", t_phase);
+
+   vpq_tp = t_phase;
+
+   uint64_t index_n;
+   uint64_t tag_n;
+
+   while(vpq_t != tail){
+       if(vpq_t == 0){
+           vpq_t = size - 1;
+       }else{
+           --vpq_t;
+       }
+
+       index_n = (vpq[vpq_t].PC & ((1<<(index+2))-1))>>2;
+       tag_n = (vpq[vpq_t].PC & ((1<<(tag+index+2))-1))>>(index+2);
+
+       if(svp[index_n].tag == tag_n){
+           if(svp[index_n].instance > 0){
+               svp[index_n].instance--;
+           }
+       }
+   }
 }

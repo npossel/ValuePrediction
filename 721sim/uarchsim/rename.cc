@@ -264,10 +264,11 @@ void pipeline_t::rename2() {
       //    so that the branch ID can be used in subsequent pipeline stages.
 
       // FIX_ME #5 BEGIN
-      if(PAY.buf[index].checkpoint)
+      if(PAY.buf[index].checkpoint) {
          PAY.buf[index].branch_ID = REN->checkpoint();
          PAY.buf[index].cpt_vpq_tail = VP->get_tail();
          PAY.buf[index].cpt_tail_phase = VP->get_tail_phase();
+      }
       // FIX_ME #5 END
    }
 
