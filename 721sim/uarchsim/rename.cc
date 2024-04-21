@@ -102,10 +102,19 @@ void pipeline_t::rename2() {
       // FIX_ME #1 END
       // Count the number of eligible instructions to value predict
       if(VP->eligible(PAY.buf[index].flags)){
+//        if(IS_LOAD(PAY.buf[index].flags) && !IS_AMO(PAY.buf[index].flags)){
+//            printf("load here\n");
+//        }
+//        if(IS_INTALU(PAY.buf[index].flags)){
+//            printf("int alu here\n");
+//        }
+//        if(IS_FPALU(PAY.buf[index].flags)){
+//            printf("fp here\n");
+//        }
         bundle_instr++;
       }
    }
-
+//    printf("\n we outside\n");
    // FIX_ME #2
    // Check if the Rename2 Stage must stall due to any of the following conditions:
    // * Not enough free checkpoints.
@@ -125,7 +134,7 @@ void pipeline_t::rename2() {
 
    // Stall if the policy is to stall and there aren't enough entries available
    if(!perf && !VP->get_policy() && VP->stall_vpq(bundle_instr)){
-      // printf("\n We shouldn't be in here right now I don't think\n");
+//      printf("\n what is bundle %d and head %lu and tail %lu and tp %d and hp %d\n", bundle_instr, VP->get_head(), VP->get_tail(), VP->get_tail_phase(), VP->get_head_phase());
       return;
    }
    //
@@ -175,7 +184,16 @@ void pipeline_t::rename2() {
       eligible = VP->eligible(PAY.buf[index].flags);
       vpq_size = VP->get_size();
       if(enable && !perf) {
-         if(eligible && vpq_size > 0 && !VP->stall_vpq(1)) {
+         if(eligible && VP->get_policy() && VP->stall_vpq(1)){
+//            printf("\n We should not be in here right now\n");
+            PAY.buf[index].in_drop = true;
+            PAY.buf[index].in_type = false;
+            PAY.buf[index].miss = false;
+            PAY.buf[index].correct = false;
+            PAY.buf[index].predicted = false;
+            PAY.buf[index].confident = false;
+            PAY.buf[index].in_vpq = false;
+         }else if(eligible && vpq_size > 0) {
             // printf("\n%lx We are in the RENAME eligible if statement\n", PAY.buf[index].pc);
 
             PAY.buf[index].vpq_entry = VP->vpq_allocate(PAY.buf[index].pc);
@@ -189,13 +207,14 @@ void pipeline_t::rename2() {
                PAY.buf[index].prediction.dw = VP->predict(PAY.buf[index].pc);
                // printf("%lx Prediction: %lu\n", PAY.buf[index].pc, PAY.buf[index].prediction.dw);
                PAY.buf[index].predicted = true;
+               PAY.buf[index].confident = VP->get_confidence(PAY.buf[index].pc);
             }
             else {
                PAY.buf[index].predicted = false;
                PAY.buf[index].correct = false;
+               PAY.buf[index].confident = false;
             }
 
-            PAY.buf[index].confident = VP->get_confidence(PAY.buf[index].pc);
             // printf("%lx Confident: %d\n", PAY.buf[index].pc, PAY.buf[index].confident);
 
             PAY.buf[index].in_drop = false;
@@ -220,22 +239,15 @@ void pipeline_t::rename2() {
                   PAY.buf[index].confident = false;
                }
             }
-         }
-         else if(!eligible) {
+         }else if(!eligible) {
             // printf("\n%lx We are in the RENAME not eligible if statement\n", PAY.buf[index].pc);
             PAY.buf[index].in_type = true;
             PAY.buf[index].in_drop = false;
             PAY.buf[index].miss = false;
+            PAY.buf[index].correct = false;
             PAY.buf[index].predicted = false;
             PAY.buf[index].confident = false;
             PAY.buf[index].in_vpq = false;
-         }
-         if(VP->stall_vpq(1)){
-            printf("\n We should not be in here right now\n");
-            PAY.buf[index].in_drop = true;
-            PAY.buf[index].in_type = false;
-            PAY.buf[index].predicted = false;
-            PAY.buf[index].confident = false;
          }
       }
 

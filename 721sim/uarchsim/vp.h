@@ -135,10 +135,16 @@ public:
     bool get_miss(uint64_t PC);
 
     // Get the vpq tail
+    uint64_t get_head(){return vpq_h;}
+
+    // Get the vpq tail
     uint64_t get_tail(){return vpq_t;}
 
     // Get the vpq tail phase
     bool get_tail_phase(){return vpq_tp;}
+
+    // Get the vpq head phase
+    bool get_head_phase(){return vpq_hp;}
 
     // Allocate entry in VPQ
     uint64_t vpq_allocate(uint64_t PC);

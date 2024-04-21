@@ -346,11 +346,12 @@ void vp::squash(){
 //             printf("BEFORE | %d: %lu TAG: %lu\n", i, svp[i].instance, svp[i].tag);
 //    }
 
-   while(vpq_t != vpq_h){
+   while(vpq_t != vpq_h || vpq_tp != vpq_hp){
 
     // TODO: implement checking phase bits in case vpq is full
        if(vpq_t == 0){
            vpq_t = size - 1;
+           vpq_tp = vpq_hp;
        }else{
            --vpq_t;
        }
@@ -414,29 +415,11 @@ void vp::cost(){
 }
 
 void vp::restore(uint64_t tail, bool t_phase){
-    // printf("\nCheckpointed Tail: %lu\n", tail);
-    // printf("Checkpointed Phase: %d\n", t_phase);
-    // printf("Current Tail pointer: %lu\n", vpq_t);
-    // printf("Current Tail Phase: %d\n", vpq_tp);
-    // printf("Current Head pointer: %lu\n", vpq_h);
-    // printf("Current Head Phase: %d\n", vpq_hp);
-//    printf("\nWe are in restore\n");
 
    vpq_tp = t_phase;
 
    uint64_t index_n;
    uint64_t tag_n;
-
-//    for(int i=0; i<entries; i++) {
-//         if(i == 21)
-//             printf("BEFORE | %d: %lu TAG: %lu\n", i, svp[i].instance, svp[i].tag);
-//         if(i == 32)
-//             printf("BEFORE | %d: %lu TAG: %lu\n", i, svp[i].instance, svp[i].tag);
-//         if(i == 40)
-//             printf("BEFORE | %d: %lu TAG: %lu\n", i, svp[i].instance, svp[i].tag);
-//         if(i == 71)
-//             printf("BEFORE | %d: %lu TAG: %lu\n", i, svp[i].instance, svp[i].tag);
-//    }
 
    while(vpq_t != tail){
        if(vpq_t == 0){
