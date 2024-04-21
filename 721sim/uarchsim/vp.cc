@@ -127,7 +127,7 @@ bool vp::get_confidence(uint64_t PC) {
     uint64_t index_n = (PC & ((1<<(index+2))-1))>>2;
     uint64_t tag_n = (PC & ((1<<(tag+index+2))-1))>>(index+2);
 
-    if((svp[index_n].tag == tag_n || tag==0) && svp[index_n].conf == confmax)
+    if((svp[index_n].tag == tag_n || tag==0) && svp[index_n].conf == confmax && svp[index_n].valid)
         return true;
     else
         return false;
@@ -162,7 +162,7 @@ bool vp::get_miss(uint64_t PC) {
     uint64_t index_n = (PC & ((1<<(index+2))-1))>>2;
     uint64_t tag_n = (PC & ((1<<(tag+index+2))-1))>>(index+2);
 
-    if(svp[index_n].tag == tag_n || tag==0) {
+    if((svp[index_n].tag == tag_n || tag==0) && svp[index_n].valid) {
         miss = false;
     }
     else {
@@ -179,11 +179,12 @@ void vp::train(uint64_t PC, uint64_t val) {
     uint64_t i;
     bool j = true;
 
-    printf("Index in SVP: %lu\n", index_n);
-    printf("Tag of SVP: %lx\n", svp[index_n].tag);
-    printf("Tag of instruction: %lx\n", tag_n);
+    // printf("Index in SVP: %lu\n", index_n);
+    // printf("Tag of SVP: %lx\n", svp[index_n].tag);
+    // printf("Tag of instruction: %lx\n", tag_n);
+    // printf("Value of instruction: %lu\n", val);
     if(svp[index_n].tag == tag_n || tag==0) {
-        printf("TAGS MATCH IN THE TRAIN\n");
+        // printf("TAGS MATCH IN THE TRAIN\n");
         new_stride = val-svp[index_n].retired_value;
         if(new_stride==svp[index_n].stride) {
             svp[index_n].conf += confinc;
@@ -195,26 +196,34 @@ void vp::train(uint64_t PC, uint64_t val) {
             if(svp[index_n].conf <= replace_stride)
                 svp[index_n].stride = new_stride;
             if(confdec > 0){
-                svp[index_n].conf -= confdec;
                 //saturate the confidence
-                if(svp[index_n].conf < 0)
+                if(confdec > svp[index_n].conf)
                     svp[index_n].conf = 0;
+                else
+                    svp[index_n].conf -= confdec;
             }
             else
                 svp[index_n].conf = 0;
         }
         svp[index_n].retired_value = val;
-        svp[index_n].instance--;
-        if(svp[index_n].instance < 0)
-            svp[index_n].instance = 0;
+        if(svp[index_n].instance != 0)
+            svp[index_n].instance--;
+
+        // printf("SVP conf: %lu\n", svp[index_n].conf);
+        // printf("SVP instance: %lu\n", svp[index_n].instance);
+        // printf("SVP retired_value: %lu\n", svp[index_n].retired_value);
+        // printf("SVP stride: %lu\n", svp[index_n].stride);
+        // printf("SVP tag: %lx\n", svp[index_n].tag);
     }
     else if(svp[index_n].conf <= replace) {
-        printf("In the else if of train");
+        // printf("In the else if of train\n");
         // Initialize
         svp[index_n].tag = tag_n;
         svp[index_n].conf = 0;
         svp[index_n].retired_value = val;
         svp[index_n].stride = val;
+        svp[index_n].instance = 0;
+        svp[index_n].valid = 1;
 
         i = vpq_h+1;
         if(i == size)
@@ -229,6 +238,11 @@ void vp::train(uint64_t PC, uint64_t val) {
             if(i == vpq_t)
                 j = false;
         }
+        // printf("SVP conf: %lu\n", svp[index_n].conf);
+        // printf("SVP instance: %lu\n", svp[index_n].instance);
+        // printf("SVP retired_value: %lu\n", svp[index_n].retired_value);
+        // printf("SVP stride: %lu\n", svp[index_n].stride);
+        // printf("SVP tag: %lx\n", svp[index_n].tag);
     }
     vpq_h++;
     if(vpq_h == size) {
@@ -240,13 +254,21 @@ void vp::train(uint64_t PC, uint64_t val) {
 // This function allocates a spot for the eligible instruction into the vpq
 // and increments the tail pointer for future allocations.
 uint64_t vp::vpq_allocate(uint64_t PC) {
+    uint64_t foo = vpq_t;
     vpq[vpq_t].PC = PC;
+    vpq[vpq_t].val = 0;
     vpq_t++;
     if(vpq_t == size) {
         vpq_t = 0;
         vpq_tp = !vpq_tp;
     }
-    return vpq_t-1;
+
+    // printf("\nVPQ HEAD: %lu\n", vpq_h);
+    // printf("VPQ HEAD phase: %lu\n", vpq_hp);
+    // printf("VPQ TAIL: %lu\n", vpq_t);
+    // printf("VPQ TAIL phase: %lu\n", vpq_tp);
+
+    return foo;
 }
 
 bool vp::stall_vpq(uint64_t bundle_instr){
@@ -264,8 +286,8 @@ bool vp::stall_vpq(uint64_t bundle_instr){
 }
 
 void vp::vpq_deposit(uint64_t index, uint64_t value) {
-    printf("Index in deposit: %lu\n", index);
-    printf("Value in deposit: %lu\n", value);
+    // printf("\nIndex in deposit: %lu\n", index);
+    // printf("Value in deposit: %lu\n", value);
     vpq[index].val = value;
 }
 
