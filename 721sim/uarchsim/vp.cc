@@ -292,6 +292,73 @@ void vp::vpq_deposit(uint64_t index, uint64_t value) {
 }
 
 void vp::squash(){
-    vpq_t = vpq_h;
-    vpq_tp = vpq_hp;
+//    uint64_t index_n;
+//    uint64_t tag_n;
+//    int check = vpq_h;
+//
+//    if(check == 0){
+//        check = size - 1;
+//    }else{
+//        check--;
+//    }
+//
+//    while(vpq_t != check){
+//        if(vpq_t == 0){
+//            vpq_t = size - 1;
+//        }else{
+//            --vpq_t;
+//        }
+//
+//        index_n = (vpq[vpq_t].PC & ((1<<(index+2))-1))>>2;
+//        tag_n = (vpq[vpq_t].PC & ((1<<(tag+index+2))-1))>>(index+2);
+//
+//        if(svp[index_n].tag == tag_n){
+//            if(svp[index_n].instance > 0){
+//                svp[index_n].instance--;
+//            }
+//        }
+//    }
+//
+//    vpq_t = vpq_h;
+//    vpq_tp = vpq_hp;
+}
+
+void vp::cost(){
+    uint64_t total = tag + (uint64_t)ceil(log2((double)(confmax+1))) + (uint64_t)ceil(log2((double)size)) +
+    sizeof(svp[0].retired_value) + sizeof(svp[0].stride);
+
+    printf("COST ACCOUNTING\n");
+    printf("\tOne SVP entry:\n");
+    printf("\t\ttag              :   %lu bits\n", tag);
+    printf("\t\tconf             :   %lu bits\n", (uint64_t)ceil(log2((double)(confmax+1))));
+    printf("\t\tretired_value    :   %lu bits\n", sizeof(svp[0].retired_value));
+    printf("\t\tstride           :   %lu bits\n", sizeof(svp[0].stride));
+    printf("\t\tinstance ctr     :   %lu bits\n", (uint64_t)ceil(log2((double)size)));
+    printf("\t\t-----------------------------\n");
+    printf("\t\tbits/SVP entry   :   %lu bits\n", total);
+    printf("\tOne VPQ entry      :   %lu bits\n", tag);
+}
+
+void vp::restore(uint64_t tail, bool t_phase){
+//    vpq_tp = t_phase;
+//
+//    uint64_t index_n;
+//    uint64_t tag_n;
+//
+//    while(vpq_t != tail){
+//        if(vpq_t == 0){
+//            vpq_t = size - 1;
+//        }else{
+//            --vpq_t;
+//        }
+//
+//        index_n = (vpq[vpq_t].PC & ((1<<(index+2))-1))>>2;
+//        tag_n = (vpq[vpq_t].PC & ((1<<(tag+index+2))-1))>>(index+2);
+//
+//        if(svp[index_n].tag == tag_n){
+//            if(svp[index_n].instance > 0){
+//                svp[index_n].instance--;
+//            }
+//        }
+//    }
 }

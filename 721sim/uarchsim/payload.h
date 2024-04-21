@@ -195,6 +195,8 @@ typedef struct {
    bool in_drop;                // flag for if the instruction is ineligible due to being dropped.
    union64_t prediction;         // prediction value from the VPU
    uint64_t vpq_entry;          // VPQ entry number
+   uint64_t cpt_vpq_tail;       // checkpointed vpq tail
+   bool cpt_tail_phase;         // checkpointed vpq tail phase bit
 
    ////////////////////////
    // Set by Dispatch Stage.

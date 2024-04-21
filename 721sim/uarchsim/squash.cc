@@ -62,6 +62,8 @@ void pipeline_t::squash_complete(reg_t jump_PC) {
 	// Writeback Stage
 	//////////////////////////
 
+    VP->squash();
+
 	for (i = 0; i < issue_width; i++) {
 		Execution_Lanes[i].rr.valid = false;
 		for (j = 0; j < Execution_Lanes[i].ex_depth; j++)

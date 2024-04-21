@@ -436,6 +436,10 @@ void pipeline_t::load_replay() {
                PAY.buf[index].correct = true;
                // printf("%lx  LOAD REPLAY: confident correct\n", PAY.buf[index].pc);
             }
+
+            if(!PAY.buf[index].correct && PAY.buf[index].confident){
+                REN->set_value_misprediction(PAY.buf[index].AL_index);
+            }
          }
          else {
             IQ.wakeup(PAY.buf[index].C_phys_reg);

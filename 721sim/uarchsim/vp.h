@@ -134,6 +134,12 @@ public:
     // Get miss flag
     bool get_miss(uint64_t PC);
 
+    // Get the vpq tail
+    uint64_t get_tail(){return vpq_t;}
+
+    // Get the vpq tail phase
+    bool get_tail_phase(){return vpq_tp;}
+
     // Allocate entry in VPQ
     uint64_t vpq_allocate(uint64_t PC);
 
@@ -149,4 +155,10 @@ public:
 
     // Full squash the vpq
     void squash();
+
+    // Cost calculator
+    void cost();
+
+    // Restoring at a branch mispredict
+    void restore(uint64_t tail, bool t_phase);
 };

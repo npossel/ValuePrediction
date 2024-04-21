@@ -146,6 +146,9 @@ void pipeline_t::writeback(unsigned int lane_number) {
                     false);
             // FIX_ME #15d END
 
+            // Restore the VPQ
+            VP->restore(PAY.buf[index].cpt_vpq_tail, PAY.buf[index].cpt_tail_phase);
+
             // Rollback PAY to the point of the branch.
             PAY.rollback(index);
          }
