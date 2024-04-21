@@ -124,7 +124,7 @@ void pipeline_t::rename2() {
    // FIX_ME #2 END
 
    // Stall if the policy is to stall and there aren't enough entries available
-   if(!VP->get_policy() && VP->stall_vpq(bundle_instr) && !perf){
+   if(!perf && !VP->get_policy() && VP->stall_vpq(bundle_instr)){
       // printf("\n We shouldn't be in here right now I don't think\n");
       return;
    }
@@ -174,9 +174,9 @@ void pipeline_t::rename2() {
       enable = VP->get_enable();
       eligible = VP->eligible(PAY.buf[index].flags);
       vpq_size = VP->get_size();
-      if(enable) {
-         if(eligible && vpq_size > 0 && !VP->stall_vpq(1) && !perf) {
-            printf("\n%lx We are in the RENAME eligible if statement\n", PAY.buf[index].pc);
+      if(enable && !perf) {
+         if(eligible && vpq_size > 0 && !VP->stall_vpq(1)) {
+            // printf("\n%lx We are in the RENAME eligible if statement\n", PAY.buf[index].pc);
 
             PAY.buf[index].vpq_entry = VP->vpq_allocate(PAY.buf[index].pc);
             // printf("%lx VPQ Entry: %lu\n", PAY.buf[index].pc, PAY.buf[index].vpq_entry);
@@ -229,7 +229,7 @@ void pipeline_t::rename2() {
             PAY.buf[index].predicted = false;
             PAY.buf[index].confident = false;
          }
-         if(VP->stall_vpq(1) && !perf){
+         if(VP->stall_vpq(1)){
             // printf("\n We should not be in here right now\n");
             PAY.buf[index].in_drop = true;
             PAY.buf[index].in_type = false;
