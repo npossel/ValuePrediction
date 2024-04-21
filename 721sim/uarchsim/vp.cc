@@ -295,8 +295,21 @@ void vp::squash(){
     printf("\nWe are in the squash of the vpq!!\n");
    uint64_t index_n;
    uint64_t tag_n;
+    
+//     for(int i=0; i<entries; i++) {
+//         if(i == 21)
+//             printf("BEFORE | %d: %lu TAG: %lu\n", i, svp[i].instance, svp[i].tag);
+//         if(i == 32)
+//             printf("BEFORE | %d: %lu TAG: %lu\n", i, svp[i].instance, svp[i].tag);
+//         if(i == 40)
+//             printf("BEFORE | %d: %lu TAG: %lu\n", i, svp[i].instance, svp[i].tag);
+//         if(i == 71)
+//             printf("BEFORE | %d: %lu TAG: %lu\n", i, svp[i].instance, svp[i].tag);
+//    }
 
    while(vpq_t != vpq_h){
+
+    // TODO: implement checking phase bits in case vpq is full
        if(vpq_t == 0){
            vpq_t = size - 1;
        }else{
@@ -306,13 +319,41 @@ void vp::squash(){
        index_n = (vpq[vpq_t].PC & ((1<<(index+2))-1))>>2;
        tag_n = (vpq[vpq_t].PC & ((1<<(tag+index+2))-1))>>(index+2);
 
+        // if(index_n == 21)
+        //     printf("21: calculated tag: %lu\n", tag_n);
+        // if(index_n == 32)
+        //     printf("32: calculated tag: %lu\n", tag_n);
+        // if(index_n == 40)
+        //     printf("40: calculated tag: %lu\n", tag_n);
+        // if(index_n == 71)
+        //     printf("71: calculated tag: %lu\n", tag_n);
+
        if(svp[index_n].tag == tag_n){
            if(svp[index_n].instance > 0){
                svp[index_n].instance--;
            }
+        //     if(index_n == 21)
+        //         printf("SQUASH DEC %lu: %lu\n", index_n, svp[index_n].instance);
+        //     if(index_n == 32)
+        //         printf("SQUASH DEC %lu: %lu\n", index_n, svp[index_n].instance);
+        //     if(index_n == 40)
+        //         printf("SQUASH DEC %lu: %lu\n", index_n, svp[index_n].instance);
+        //     if(index_n == 71)
+        //         printf("SQUASH DEC %lu: %lu\n", index_n, svp[index_n].instance);
        }
    }
    vpq_tp = vpq_hp;
+
+//    for(int i=0; i<entries; i++) {
+//     if(i == 21)
+//         printf("AFTER | %d: %lu TAG: %lu\n", i, svp[i].instance, svp[i].tag);
+//     if(i == 32)
+//         printf("AFTER | %d: %lu TAG: %lu\n", i, svp[i].instance, svp[i].tag);
+//     if(i == 40)
+//         printf("AFTER | %d: %lu TAG: %lu\n", i, svp[i].instance, svp[i].tag);
+//     if(i == 71)
+//         printf("AFTER | %d: %lu TAG: %lu\n", i, svp[i].instance, svp[i].tag);
+//    }
 
    assert(vpq_h == vpq_t);
 }
@@ -340,13 +381,23 @@ void vp::restore(uint64_t tail, bool t_phase){
     // printf("Current Tail Phase: %d\n", vpq_tp);
     // printf("Current Head pointer: %lu\n", vpq_h);
     // printf("Current Head Phase: %d\n", vpq_hp);
+    printf("\nWe are in restore\n");
 
    vpq_tp = t_phase;
 
    uint64_t index_n;
    uint64_t tag_n;
-   bool j = true;
-   uint64_t i = vpq_h;
+
+//    for(int i=0; i<entries; i++) {
+//         if(i == 21)
+//             printf("BEFORE | %d: %lu TAG: %lu\n", i, svp[i].instance, svp[i].tag);
+//         if(i == 32)
+//             printf("BEFORE | %d: %lu TAG: %lu\n", i, svp[i].instance, svp[i].tag);
+//         if(i == 40)
+//             printf("BEFORE | %d: %lu TAG: %lu\n", i, svp[i].instance, svp[i].tag);
+//         if(i == 71)
+//             printf("BEFORE | %d: %lu TAG: %lu\n", i, svp[i].instance, svp[i].tag);
+//    }
 
    while(vpq_t != tail){
        if(vpq_t == 0){
@@ -358,19 +409,38 @@ void vp::restore(uint64_t tail, bool t_phase){
        index_n = (vpq[vpq_t].PC & ((1<<(index+2))-1))>>2;
        tag_n = (vpq[vpq_t].PC & ((1<<(tag+index+2))-1))>>(index+2);
 
+    //    if(index_n == 21)
+    //         printf("21: calculated tag: %lu\n", tag_n);
+    //     if(index_n == 32)
+    //         printf("32: calculated tag: %lu\n", tag_n);
+    //     if(index_n == 40)
+    //         printf("40: calculated tag: %lu\n", tag_n);
+    //     if(index_n == 71)
+    //         printf("71: calculated tag: %lu\n", tag_n);
+
        if(svp[index_n].tag == tag_n || tag == 0){
            if(svp[index_n].instance > 0){
                svp[index_n].instance--;
             //    printf("%lx instance: %lu\n", vpq[vpq_t].PC, svp[index_n].instance);
            }
+        //    if(index_n == 21)
+        //         printf("SQUASH DEC %lu: %lu\n", index_n, svp[index_n].instance);
+        //     if(index_n == 32)
+        //         printf("SQUASH DEC %lu: %lu\n", index_n, svp[index_n].instance);
+        //     if(index_n == 40)
+        //         printf("SQUASH DEC %lu: %lu\n", index_n, svp[index_n].instance);
+        //     if(index_n == 71)
+        //         printf("SQUASH DEC %lu: %lu\n", index_n, svp[index_n].instance);
        }
    }
-//    while(j) {
-//         printf("%lu: %lx\n", i, vpq[i].PC);
-//         i++;
-//         if(i == size)
-//             i = 0;
-//         if(i == vpq_t)
-//             j = false;
-//     }
+//    for(int i=0; i<entries; i++) {
+//     if(i == 21)
+//         printf("AFTER | %d: %lu TAG: %lu\n", i, svp[i].instance, svp[i].tag);
+//     if(i == 32)
+//         printf("AFTER | %d: %lu TAG: %lu\n", i, svp[i].instance, svp[i].tag);
+//     if(i == 40)
+//         printf("AFTER | %d: %lu TAG: %lu\n", i, svp[i].instance, svp[i].tag);
+//     if(i == 71)
+//         printf("AFTER | %d: %lu TAG: %lu\n", i, svp[i].instance, svp[i].tag);
+//    }
 }
