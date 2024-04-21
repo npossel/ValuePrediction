@@ -134,6 +134,7 @@ void pipeline_t::rename2() {
 
    // Stall if the policy is to stall and there aren't enough entries available
    if(!perf && !VP->get_policy() && VP->stall_vpq(bundle_instr)){
+      // printf("\nSTALLING!!\nBundle size = %u", bundle_instr);
       return;
    }
    //
@@ -183,15 +184,7 @@ void pipeline_t::rename2() {
       eligible = VP->eligible(PAY.buf[index].flags);
       vpq_size = VP->get_size();
       if(enable && !perf) {
-         if(eligible && VP->get_policy() && VP->stall_vpq(1)){
-            PAY.buf[index].in_drop = true;
-            PAY.buf[index].in_type = false;
-            PAY.buf[index].miss = false;
-            PAY.buf[index].correct = false;
-            PAY.buf[index].predicted = false;
-            PAY.buf[index].confident = false;
-            PAY.buf[index].in_vpq = false;
-         }else if(eligible && vpq_size > 0) {
+         if(eligible && vpq_size > 0) {
             // Allocate vpq entry
             PAY.buf[index].vpq_entry = VP->vpq_allocate(PAY.buf[index].pc);
             PAY.buf[index].in_vpq = true;
@@ -220,19 +213,31 @@ void pipeline_t::rename2() {
             // Specifically for Oracle mode. If the prediction matches, it is confident, else it is not.
             // This allows for skipping of the recovery step
             if(VP->get_oracle()) {
-               actual = get_pipe()->peek(PAY.buf[index].db_index);
+               if(PAY.buf[index].good_instruction) {
+                  actual = get_pipe()->peek(PAY.buf[index].db_index);
 
-               if(PAY.buf[index].prediction.dw == actual->a_rdst[0].value && !PAY.buf[index].miss) {
-                  PAY.buf[index].confident = true;
+                  if(PAY.buf[index].prediction.dw == actual->a_rdst[0].value && !PAY.buf[index].miss) {
+                     PAY.buf[index].confident = true;
+                  }
+                  else
+                     PAY.buf[index].confident = false;
                }
-               else {
+               else
                   PAY.buf[index].confident = false;
-               }
             }
          }else if(!eligible) {
             // printf("\n%lx We are in the RENAME not eligible if statement\n", PAY.buf[index].pc);
             PAY.buf[index].in_type = true;
             PAY.buf[index].in_drop = false;
+            PAY.buf[index].miss = false;
+            PAY.buf[index].correct = false;
+            PAY.buf[index].predicted = false;
+            PAY.buf[index].confident = false;
+            PAY.buf[index].in_vpq = false;
+         }else if(eligible && VP->get_policy() && VP->stall_vpq(1)){
+            // VP->check_full();
+            PAY.buf[index].in_drop = true;
+            PAY.buf[index].in_type = false;
             PAY.buf[index].miss = false;
             PAY.buf[index].correct = false;
             PAY.buf[index].predicted = false;

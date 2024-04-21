@@ -228,6 +228,7 @@ void vp::train(uint64_t PC, uint64_t val) {
         vpq_h = 0;
         vpq_hp = !vpq_hp;
     }
+    // printf("\nHEAD MOVED FORWARD\nhead: %lu\nhead pointer: %d\ntail: %lu\ntail pointer: %d\n", vpq_h, vpq_hp, vpq_t, vpq_tp);
 }
 
 // This function allocates a spot for the eligible instruction into the vpq
@@ -241,6 +242,7 @@ uint64_t vp::vpq_allocate(uint64_t PC) {
         vpq_t = 0;
         vpq_tp = !vpq_tp;
     }
+    // printf("\nTAIL MOVED FORWARD\nhead: %lu\nhead pointer: %d\ntail: %lu\ntail pointer: %d\n", vpq_h, vpq_hp, vpq_t, vpq_tp);
     return foo;
 }
 
@@ -275,6 +277,7 @@ void vp::squash(){
        }else{
            --vpq_t;
        }
+    //    printf("\nTAIL MOVED BACK\nhead: %lu\nhead pointer: %d\ntail: %lu\ntail pointer: %d\n", vpq_h, vpq_hp, vpq_t, vpq_tp);
 
        index_n = (vpq[vpq_t].PC & ((1<<(index+2))-1))>>2;
        tag_n = (vpq[vpq_t].PC & ((1<<(tag+index+2))-1))>>(index+2);
@@ -318,6 +321,7 @@ void vp::restore(uint64_t tail, bool t_phase){
        }else{
            --vpq_t;
        }
+    //    printf("\nTAIL MOVED BACK\nhead: %lu\nhead pointer: %d\ntail: %lu\ntail pointer: %d\n", vpq_h, vpq_hp, vpq_t, vpq_tp);
 
        index_n = (vpq[vpq_t].PC & ((1<<(index+2))-1))>>2;
        tag_n = (vpq[vpq_t].PC & ((1<<(tag+index+2))-1))>>(index+2);
@@ -328,4 +332,8 @@ void vp::restore(uint64_t tail, bool t_phase){
            }
        }
    }
+}
+
+void vp::check_full() {
+    printf("\nTAIL MOVED BACK\nhead: %lu\nhead pointer: %d\ntail: %lu\ntail pointer: %d\n", vpq_h, vpq_hp, vpq_t, vpq_tp);
 }

@@ -167,4 +167,6 @@ public:
 
     // Restoring at a branch mispredict
     void restore(uint64_t tail, bool t_phase);
+
+    void check_full();
 };
