@@ -16,7 +16,6 @@ void pipeline_t::dispatch() {
    bool B_ready;
    bool D_ready;
    bool enable;
-   bool eligible;
    bool vp_perf;
    uint64_t vpq_size;
    db_t* actual;
@@ -168,15 +167,12 @@ void pipeline_t::dispatch() {
 
       enable = VP->get_enable();
       vp_perf = VP->get_perf();
-      eligible = VP->eligible(PAY.buf[index].flags);
       vpq_size = VP->get_size();
       if(enable) {
          // printf("\n%lx We are in the DISPATCH enable\n", PAY.buf[index].pc);
          if(PAY.buf[index].good_instruction && PAY.buf[index].C_valid && !branch_flag && vp_perf) {
             // set prf ready bit and write perfect predicted value into prf
             actual = get_pipe()->peek(PAY.buf[index].db_index);
-            PAY.buf[index].predicted = true;
-            PAY.buf[index].prediction.dw = actual->a_rdst[0].value;
             REN->set_ready(PAY.buf[index].C_phys_reg);
             REN->write(PAY.buf[index].C_phys_reg, actual->a_rdst[0].value);
             PAY.buf[index].confident = true;
@@ -186,7 +182,12 @@ void pipeline_t::dispatch() {
 
             // printf("\n%lx We are in the DISPATCH perfect if statement\n", PAY.buf[index].pc);
          }
-         else if(PAY.buf[index].predicted && vpq_size > 0) {
+         else if(vp_perf) {
+            PAY.buf[index].correct = false;
+            PAY.buf[index].confident = false;
+            PAY.buf[index].in_type = true;
+         }
+         if(PAY.buf[index].predicted && vpq_size > 0) {
             // printf("\n%lx We are in the DISPATCH eligible AND SVP if statement\n", PAY.buf[index].pc);
             if(PAY.buf[index].confident && PAY.buf[index].C_valid){
                REN->set_ready(PAY.buf[index].C_phys_reg);

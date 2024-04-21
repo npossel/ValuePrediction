@@ -228,9 +228,10 @@ void pipeline_t::rename2() {
             PAY.buf[index].miss = false;
             PAY.buf[index].predicted = false;
             PAY.buf[index].confident = false;
+            PAY.buf[index].in_vpq = false;
          }
          if(VP->stall_vpq(1)){
-            // printf("\n We should not be in here right now\n");
+            printf("\n We should not be in here right now\n");
             PAY.buf[index].in_drop = true;
             PAY.buf[index].in_type = false;
             PAY.buf[index].predicted = false;
