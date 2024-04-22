@@ -204,9 +204,6 @@ void pipeline_t::rename2() {
                PAY.buf[index].confident = false;
             }
 
-            // Get confidence of prediction
-            PAY.buf[index].confident = VP->get_confidence(PAY.buf[index].pc);
-
             PAY.buf[index].in_drop = false;
             PAY.buf[index].in_type = false;
 

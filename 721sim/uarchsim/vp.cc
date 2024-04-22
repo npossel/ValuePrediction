@@ -270,7 +270,6 @@ void vp::squash(){
 
    while(vpq_t != vpq_h || vpq_tp != vpq_hp){
 
-    // TODO: implement checking phase bits in case vpq is full
        if(vpq_t == 0){
            vpq_t = size - 1;
            vpq_tp = vpq_hp;
@@ -306,7 +305,9 @@ void vp::cost(){
     printf("\t\tinstance ctr     :   %lu bits\n", (uint64_t)ceil(log2((double)size)));
     printf("\t\t-----------------------------\n");
     printf("\t\tbits/SVP entry   :   %lu bits\n", total);
-    printf("\tOne VPQ entry      :   %lu bits\n", tag);
+    printf("\tOne VPQ entry:\n");
+    total = sizeof(vpq[0].tag)
+    printf("\t\tbits/SVP entry   :   %lu bits\n", total);
 }
 
 void vp::restore(uint64_t tail, bool t_phase){
