@@ -292,39 +292,6 @@ void vp::squash(){
    assert(vpq_h == vpq_t);
 }
 
-void vp::cost(FILE* file){
-    fprintf(file, "\nCOST ACCOUNTING\n");
-    if(!perf && enable){
-        uint64_t SVP_bits = tag + (uint64_t)ceil(log2((double)(confmax+1))) + (uint64_t)ceil(log2((double)size)) +
-        sizeof(svp[0].retired_value) * 8 + sizeof(svp[0].stride) * 8;
-        uint64_t VPQ_bits = tag + index + sizeof(vpq[0].val) * 8;
-
-        fprintf(file, "\tOne SVP entry:\n");
-        fprintf(file, "\t\ttag              :%4lu bits\n", tag);
-        fprintf(file, "\t\tconf             :%4lu bits\n", (uint64_t)ceil(log2((double)(confmax+1))));
-        fprintf(file, "\t\tretired_value    :%4lu bits\n", sizeof(svp[0].retired_value) * 8);
-        fprintf(file, "\t\tstride           :%4lu bits\n", sizeof(svp[0].stride) * 8);
-        fprintf(file, "\t\tinstance ctr     :%4lu bits\n", (uint64_t)ceil(log2((double)size)));
-        fprintf(file, "\t\t---------------------------\n");
-        fprintf(file, "\t\tbits/SVP entry   :%4lu bits\n", SVP_bits);
-        fprintf(file, "\tOne VPQ entry:\n");
-        fprintf(file, "\t\tPC_tag           :%4lu bits\n", tag);
-        fprintf(file, "\t\tPC_index         :%4lu bits\n", index);
-        fprintf(file, "\t\tvalue            :%4lu bits\n", sizeof(vpq[0].val) * 8);
-        fprintf(file, "\t\t---------------------------\n");
-        fprintf(file, "\t\tbits/VPQ entry   :%4lu bits\n", VPQ_bits);
-        uint64_t SVP_entries = pow(2, index);
-        uint64_t total_SVP = SVP_bits * SVP_entries;
-        uint64_t total_VPQ = size * VPQ_bits;
-        fprintf(file, "\tTotal storage cost (bits) = %lu (%lu SVP entries x %lu bits/SVP entry) ", total_SVP, SVP_entries, SVP_bits);
-        fprintf(file, "+ %lu (%lu VPQ entries x %lu bits/VPQ entry) = %lu bits\n", total_VPQ, size, VPQ_bits, total_VPQ + total_SVP);
-        double total_in_bytes = double(total_SVP + total_VPQ)/8;
-        fprintf(file, "\tTotal storage cost (bytes) = %.2f B (%.2f KB)\n", total_in_bytes, total_in_bytes/1024);
-    }else
-        fprintf(file, "\tImpossible.\n");
-
-}
-
 void vp::restore(uint64_t tail, bool t_phase){
    vpq_tp = t_phase;
 
@@ -390,5 +357,38 @@ void vp::vpq_settings(FILE* file){
     }else
         fprintf(file, "none\n");
 
+
+}
+
+void vp::cost(FILE* file){
+    fprintf(file, "\nCOST ACCOUNTING\n");
+    if(!perf && enable){
+        uint64_t SVP_bits = tag + (uint64_t)ceil(log2((double)(confmax+1))) + (uint64_t)ceil(log2((double)size)) +
+        sizeof(svp[0].retired_value) * 8 + sizeof(svp[0].stride) * 8;
+        uint64_t VPQ_bits = tag + index + sizeof(vpq[0].val) * 8;
+
+        fprintf(file, "\tOne SVP entry:\n");
+        fprintf(file, "\t\ttag              :%4lu bits\n", tag);
+        fprintf(file, "\t\tconf             :%4lu bits\n", (uint64_t)ceil(log2((double)(confmax+1))));
+        fprintf(file, "\t\tretired_value    :%4lu bits\n", sizeof(svp[0].retired_value) * 8);
+        fprintf(file, "\t\tstride           :%4lu bits\n", sizeof(svp[0].stride) * 8);
+        fprintf(file, "\t\tinstance ctr     :%4lu bits\n", (uint64_t)ceil(log2((double)size)));
+        fprintf(file, "\t\t---------------------------\n");
+        fprintf(file, "\t\tbits/SVP entry   :%4lu bits\n", SVP_bits);
+        fprintf(file, "\tOne VPQ entry:\n");
+        fprintf(file, "\t\tPC_tag           :%4lu bits\n", tag);
+        fprintf(file, "\t\tPC_index         :%4lu bits\n", index);
+        fprintf(file, "\t\tvalue            :%4lu bits\n", sizeof(vpq[0].val) * 8);
+        fprintf(file, "\t\t---------------------------\n");
+        fprintf(file, "\t\tbits/VPQ entry   :%4lu bits\n", VPQ_bits);
+        uint64_t SVP_entries = pow(2, index);
+        uint64_t total_SVP = SVP_bits * SVP_entries;
+        uint64_t total_VPQ = size * VPQ_bits;
+        fprintf(file, "\tTotal storage cost (bits) = %lu (%lu SVP entries x %lu bits/SVP entry) ", total_SVP, SVP_entries, SVP_bits);
+        fprintf(file, "+ %lu (%lu VPQ entries x %lu bits/VPQ entry) = %lu bits\n", total_VPQ, size, VPQ_bits, total_VPQ + total_SVP);
+        double total_in_bytes = double(total_SVP + total_VPQ)/8;
+        fprintf(file, "\tTotal storage cost (bytes) = %.2f B (%.2f KB)\n", total_in_bytes, total_in_bytes/1024);
+    }else
+        fprintf(file, "\tImpossible.\n");
 
 }
