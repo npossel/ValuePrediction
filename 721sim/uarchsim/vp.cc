@@ -268,31 +268,45 @@ void vp::vpq_deposit(uint64_t index, uint64_t value) {
 }
 
 void vp::squash(){
-   uint64_t index_n;
-   uint64_t tag_n;
+    uint64_t index_n;
+    uint64_t tag_n;
 
-   while(vpq_t != vpq_h || vpq_tp != vpq_hp){
+//        if(svp[index_n].tag == tag_n || tag == 0){
+//            if(svp[index_n].instance > 0){
+//                svp[index_n].instance--;
+//            }
+//        }
+//    }
+//    vpq_tp = vpq_hp;
+    bool tmp;
+    for(int i = 0; i<entries; i++) {
+        svp[i].instance = 0;
+    }
+    vpq_tp = vpq_hp;
+    vpq_t = vpq_h;
 
-       if(vpq_t == 0){
-           vpq_t = size - 1;
-           vpq_tp = vpq_hp;
-       }else{
-           --vpq_t;
-       }
-    //    printf("\nTAIL MOVED BACK\nhead: %lu\nhead pointer: %d\ntail: %lu\ntail pointer: %d\n", vpq_h, vpq_hp, vpq_t, vpq_tp);
+//    while(vpq_t != vpq_h || vpq_tp != vpq_hp){
 
-       index_n = (vpq[vpq_t].PC & ((1<<(index+2))-1))>>2;
-       tag_n = (vpq[vpq_t].PC & ((1<<(tag+index+2))-1))>>(index+2);
+//        if(vpq_t == 0){
+//            vpq_t = size - 1;
+//            vpq_tp = vpq_hp;
+//        }else{
+//            --vpq_t;
+//        }
+//     //    printf("\nTAIL MOVED BACK\nhead: %lu\nhead pointer: %d\ntail: %lu\ntail pointer: %d\n", vpq_h, vpq_hp, vpq_t, vpq_tp);
 
-       if(svp[index_n].tag == tag_n || tag == 0){
-           if(svp[index_n].instance > 0){
-               svp[index_n].instance--;
-           }
-       }
-   }
-   vpq_tp = vpq_hp;
+//        index_n = (vpq[vpq_t].PC & ((1<<(index+2))-1))>>2;
+//        tag_n = (vpq[vpq_t].PC & ((1<<(tag+index+2))-1))>>(index+2);
 
-   assert(vpq_h == vpq_t);
+//        if(svp[index_n].tag == tag_n){
+//            if(svp[index_n].instance > 0){
+//                svp[index_n].instance--;
+//            }
+//        }
+//    }
+//    vpq_tp = vpq_hp;
+
+//    assert(vpq_h == vpq_t);
 }
 
 void vp::restore(uint64_t tail, bool t_phase){
