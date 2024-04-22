@@ -111,7 +111,7 @@ void pipeline_t::rename2() {
 //        if(IS_FPALU(PAY.buf[index].flags)){
 //            printf("fp here\n");
 //        }
-        bundle_instr++;
+          bundle_instr++;
       }
    }
 //    printf("\n we outside\n");
@@ -184,7 +184,7 @@ void pipeline_t::rename2() {
       eligible = VP->eligible(PAY.buf[index].flags);
       vpq_size = VP->get_size();
       if(enable && !perf) {
-         if(eligible && vpq_size > 0) {
+         if(eligible && vpq_size > 0 && !VP->stall_vpq(1)) {
             // Allocate vpq entry
             PAY.buf[index].vpq_entry = VP->vpq_allocate(PAY.buf[index].pc);
             PAY.buf[index].in_vpq = true;

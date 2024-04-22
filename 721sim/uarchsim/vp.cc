@@ -281,7 +281,7 @@ void vp::squash(){
        index_n = (vpq[vpq_t].PC & ((1<<(index+2))-1))>>2;
        tag_n = (vpq[vpq_t].PC & ((1<<(tag+index+2))-1))>>(index+2);
 
-       if(svp[index_n].tag == tag_n){
+       if(svp[index_n].tag == tag_n || tag == 0){
            if(svp[index_n].instance > 0){
                svp[index_n].instance--;
            }
@@ -292,22 +292,37 @@ void vp::squash(){
    assert(vpq_h == vpq_t);
 }
 
-void vp::cost(){
-    uint64_t total = tag + (uint64_t)ceil(log2((double)(confmax+1))) + (uint64_t)ceil(log2((double)size)) +
-    sizeof(svp[0].retired_value) + sizeof(svp[0].stride);
+void vp::cost(FILE* file){
+    fprintf(file, "\nCOST ACCOUNTING\n");
+    if(!perf && enable){
+        uint64_t SVP_bits = tag + (uint64_t)ceil(log2((double)(confmax+1))) + (uint64_t)ceil(log2((double)size)) +
+        sizeof(svp[0].retired_value) * 8 + sizeof(svp[0].stride) * 8;
+        uint64_t VPQ_bits = tag + index + sizeof(vpq[0].val) * 8;
 
-    printf("COST ACCOUNTING\n");
-    printf("\tOne SVP entry:\n");
-    printf("\t\ttag              :   %lu bits\n", tag);
-    printf("\t\tconf             :   %lu bits\n", (uint64_t)ceil(log2((double)(confmax+1))));
-    printf("\t\tretired_value    :   %lu bits\n", sizeof(svp[0].retired_value));
-    printf("\t\tstride           :   %lu bits\n", sizeof(svp[0].stride));
-    printf("\t\tinstance ctr     :   %lu bits\n", (uint64_t)ceil(log2((double)size)));
-    printf("\t\t-----------------------------\n");
-    printf("\t\tbits/SVP entry   :   %lu bits\n", total);
-    printf("\tOne VPQ entry:\n");
-    total = sizeof(vpq[0].tag)
-    printf("\t\tbits/SVP entry   :   %lu bits\n", total);
+        fprintf(file, "\tOne SVP entry:\n");
+        fprintf(file, "\t\ttag              :%4lu bits\n", tag);
+        fprintf(file, "\t\tconf             :%4lu bits\n", (uint64_t)ceil(log2((double)(confmax+1))));
+        fprintf(file, "\t\tretired_value    :%4lu bits\n", sizeof(svp[0].retired_value) * 8);
+        fprintf(file, "\t\tstride           :%4lu bits\n", sizeof(svp[0].stride) * 8);
+        fprintf(file, "\t\tinstance ctr     :%4lu bits\n", (uint64_t)ceil(log2((double)size)));
+        fprintf(file, "\t\t---------------------------\n");
+        fprintf(file, "\t\tbits/SVP entry   :%4lu bits\n", SVP_bits);
+        fprintf(file, "\tOne VPQ entry:\n");
+        fprintf(file, "\t\tPC_tag           :%4lu bits\n", tag);
+        fprintf(file, "\t\tPC_index         :%4lu bits\n", index);
+        fprintf(file, "\t\tvalue            :%4lu bits\n", sizeof(vpq[0].val) * 8);
+        fprintf(file, "\t\t---------------------------\n");
+        fprintf(file, "\t\tbits/VPQ entry   :%4lu bits\n", VPQ_bits);
+        uint64_t SVP_entries = pow(2, index);
+        uint64_t total_SVP = SVP_bits * SVP_entries;
+        uint64_t total_VPQ = size * VPQ_bits;
+        fprintf(file, "\tTotal storage cost (bits) = %lu (%lu SVP entries x %lu bits/SVP entry) ", total_SVP, SVP_entries, SVP_bits);
+        fprintf(file, "+ %lu (%lu VPQ entries x %lu bits/VPQ entry) = %lu bits\n", total_VPQ, size, VPQ_bits, total_VPQ + total_SVP);
+        double total_in_bytes = double(total_SVP + total_VPQ)/8;
+        fprintf(file, "\tTotal storage cost (bytes) = %.2f B (%.2f KB)\n", total_in_bytes, total_in_bytes/1024);
+    }else
+        fprintf(file, "\tImpossible.\n");
+
 }
 
 void vp::restore(uint64_t tail, bool t_phase){
@@ -337,4 +352,43 @@ void vp::restore(uint64_t tail, bool t_phase){
 
 void vp::check_full() {
     printf("\nTAIL MOVED BACK\nhead: %lu\nhead pointer: %d\ntail: %lu\ntail pointer: %d\n", vpq_h, vpq_hp, vpq_t, vpq_tp);
+}
+
+void vp::vpq_settings(FILE* file){
+
+    fprintf(file, "\n=== VALUE PREDICTOR =============================================================\n\n");
+    fprintf(file, "VALUE PREDICTOR = ");
+    if(perf){
+        fprintf(file, "perfect\n");
+    }else if(enable){
+        fprintf(file, "stride (Project 4 spec. implementation)\n");
+        fprintf(file, "   VPQsize             = %lu \n", size);
+        fprintf(file, "   oracleconf          = %d ", oracle);
+        if(oracle)
+            fprintf(file, "(oracle confidence)\n");
+        else
+            fprintf(file, "(real confidence)\n");
+        fprintf(file, "   # index bits        = %lu \n", index);
+        fprintf(file, "   # tag bits          = %lu \n", tag);
+        fprintf(file, "   confmax             = %lu \n", confmax);
+        fprintf(file, "   confinc             = %lu \n", confinc);
+        fprintf(file, "   confdec             = %lu ", confdec);
+        if(confdec == 0)
+            fprintf(file, "(reset)\n");
+        else
+            fprintf(file, "\n");
+        fprintf(file, "   replace_stride      = %lu \n", replace_stride);
+        fprintf(file, "   replace             = %lu \n", replace);
+        fprintf(file, "   predINTALU          = %d \n", predINTALU);
+        fprintf(file, "   predFPALU           = %d \n", predFPALU);
+        fprintf(file, "   predLOAD            = %d \n", predLOAD);
+        fprintf(file, "   VPQ_full_policy     = %d ", full_policy);
+        if(full_policy)
+            fprintf(file, "(don’t allocate VPQ entries)\n");
+        else
+            fprintf(file, "(stall bundle)\n");
+    }else
+        fprintf(file, "none\n");
+
+
 }
