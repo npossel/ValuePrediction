@@ -10,7 +10,6 @@ public:
     uint64_t retired_value = 0;
     int64_t stride = 0;
     uint64_t instance = 0;
-    bool valid = false;
 };
 
 class valuepredqueue {

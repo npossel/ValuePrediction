@@ -127,7 +127,7 @@ bool vp::get_confidence(uint64_t PC) {
     uint64_t index_n = (PC & ((1<<(index+2))-1))>>2;
     uint64_t tag_n = (PC & ((1<<(tag+index+2))-1))>>(index+2);
 
-    if((svp[index_n].tag == tag_n || tag==0) && svp[index_n].conf == confmax && svp[index_n].valid)
+    if((svp[index_n].tag == tag_n || tag==0) && svp[index_n].conf == confmax)
         return true;
     else
         return false;
@@ -162,7 +162,7 @@ bool vp::get_miss(uint64_t PC) {
     uint64_t index_n = (PC & ((1<<(index+2))-1))>>2;
     uint64_t tag_n = (PC & ((1<<(tag+index+2))-1))>>(index+2);
 
-    if((svp[index_n].tag == tag_n || tag==0) && svp[index_n].valid) {
+    if(svp[index_n].tag == tag_n || tag==0) {
         miss = false;
     }
     else {
@@ -177,8 +177,9 @@ void vp::train(uint64_t PC, uint64_t val) {
     int64_t new_stride;
     uint64_t tmp_tail;
     uint64_t i;
-
+//    printf("%lu tag train %lu\n", tag_n, tag);
     if(svp[index_n].tag == tag_n || tag==0) {
+//        printf("%lu does it go here?\n", index_n);
         new_stride = val-svp[index_n].retired_value;
         if(new_stride==svp[index_n].stride) {
             svp[index_n].conf += confinc;
@@ -204,13 +205,15 @@ void vp::train(uint64_t PC, uint64_t val) {
             svp[index_n].instance--;
     }
     else if(svp[index_n].conf <= replace) {
+//        printf("%lu or go here?\n", index_n);
         // Initialize
-        svp[index_n].tag = tag_n;
+        if(tag != 0){
+            svp[index_n].tag = tag_n;
+        }
         svp[index_n].conf = 0;
         svp[index_n].retired_value = val;
         svp[index_n].stride = val;
         svp[index_n].instance = 0;
-        svp[index_n].valid = 1;
         i = vpq_h+1;
         if(i == size)
             i = 0;
