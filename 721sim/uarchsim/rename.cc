@@ -223,7 +223,6 @@ void pipeline_t::rename2() {
                   PAY.buf[index].confident = false;
             }
          }else if(!eligible) {
-            // printf("\n%lx We are in the RENAME not eligible if statement\n", PAY.buf[index].pc);
             PAY.buf[index].in_type = true;
             PAY.buf[index].in_drop = false;
             PAY.buf[index].miss = false;
@@ -232,7 +231,6 @@ void pipeline_t::rename2() {
             PAY.buf[index].confident = false;
             PAY.buf[index].in_vpq = false;
          }else if(eligible && VP->get_policy() && VP->stall_vpq(1)){
-            // VP->check_full();
             PAY.buf[index].in_drop = true;
             PAY.buf[index].in_type = false;
             PAY.buf[index].miss = false;
