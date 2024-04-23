@@ -23,7 +23,7 @@ for item in vpq_size:
     sim_flags2 = sim_flags + flags
     command = sim_launch + sim_name2 + sim_flags2
     call(command, shell=True)
-    collect = "sim-collect " + sim_name2 + " > " + name + ".txt"
+    collect = "sim-collect " + name + " > " + name + ".txt"
     call(collect, shell=True)
 
 for item in index_bits:
@@ -33,7 +33,7 @@ for item in index_bits:
     sim_flags2 = sim_flags + flags
     command = sim_launch + sim_name2 + sim_flags2
     call(command, shell=True)
-    collect = "sim-collect " + sim_name2 + " > " + name + ".txt"
+    collect = "sim-collect " + name + " > " + name + ".txt"
     call(collect, shell=True)
 
 for item in tag_bits:
@@ -43,7 +43,7 @@ for item in tag_bits:
     sim_flags2  = sim_flags + flags
     command = sim_launch + sim_name2 + sim_flags2
     call(command, shell=True)
-    collect = "sim-collect " + sim_name2 + " > " + name + ".txt"
+    collect = "sim-collect " + name + " > " + name + ".txt"
     call(collect, shell=True)
 
 for item in confmax:
@@ -53,7 +53,7 @@ for item in confmax:
     sim_flags2  = sim_flags + flags
     command = sim_launch + sim_name2 + sim_flags2
     call(command, shell=True)
-    collect = "sim-collect " + sim_name2 + " > " + name + ".txt"
+    collect = "sim-collect " + name + " > " + name + ".txt"
     call(collect, shell=True)
 
 for item in confinc:
@@ -63,7 +63,7 @@ for item in confinc:
     sim_flags2  = sim_flags + flags
     command = sim_launch + sim_name2 + sim_flags2
     call(command, shell=True)
-    collect = "sim-collect " + sim_name2 + " > " + name + ".txt"
+    collect = "sim-collect " + name + " > " + name + ".txt"
     call(collect, shell=True)
 
 for item in confdec:
@@ -73,7 +73,7 @@ for item in confdec:
     sim_flags2  = sim_flags + flags
     command = sim_launch + sim_name2 + sim_flags2
     call(command, shell=True)
-    collect = "sim-collect " + sim_name2 + " > " + name + ".txt"
+    collect = "sim-collect " + name + " > " + name + ".txt"
     call(collect, shell=True)
 
 for item in replace_stride:
@@ -83,7 +83,7 @@ for item in replace_stride:
     sim_flags2  = sim_flags + flags
     command = sim_launch + sim_name2 + sim_flags2
     call(command, shell=True)
-    collect = "sim-collect " + sim_name2 + " > " + name + ".txt"
+    collect = "sim-collect " + name + " > " + name + ".txt"
     call(collect, shell=True)
 
 for item in replace:
@@ -93,5 +93,5 @@ for item in replace:
     sim_flags2  = sim_flags + flags
     command = sim_launch + sim_name2 + sim_flags2
     call(command, shell=True)
-    collect = "sim-collect " + sim_name2 + " > " + name + ".txt"
+    collect = "sim-collect " + name + " > " + name + ".txt"
     call(collect, shell=True)

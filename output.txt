@@ -1,0 +1,64 @@
+sim-launch --721sim ./721sim --sim-name size_150 --sim-flags "--vp-enable=1 --vp-svp=150,0,10,10,15,1,0,15,15,1,0,1,0 --mdp=3,31 --perf=0,0,0,1 -t --cbpALG=0 --fq=64 --cp=32 --al=256 --lsq=128 --iq=64 --iqnp=4 --fw=8 --dw=8 --iw=16 --rw=8 -e10000000"
+sim-collect  --sim-name size_150 > size_150.txt
+sim-launch --721sim ./721sim --sim-name size_175 --sim-flags "--vp-enable=1 --vp-svp=175,0,10,10,15,1,0,15,15,1,0,1,0 --mdp=3,31 --perf=0,0,0,1 -t --cbpALG=0 --fq=64 --cp=32 --al=256 --lsq=128 --iq=64 --iqnp=4 --fw=8 --dw=8 --iw=16 --rw=8 -e10000000"
+sim-collect  --sim-name size_175 > size_175.txt
+sim-launch --721sim ./721sim --sim-name size_200 --sim-flags "--vp-enable=1 --vp-svp=200,0,10,10,15,1,0,15,15,1,0,1,0 --mdp=3,31 --perf=0,0,0,1 -t --cbpALG=0 --fq=64 --cp=32 --al=256 --lsq=128 --iq=64 --iqnp=4 --fw=8 --dw=8 --iw=16 --rw=8 -e10000000"
+sim-collect  --sim-name size_200 > size_200.txt
+sim-launch --721sim ./721sim --sim-name size_225 --sim-flags "--vp-enable=1 --vp-svp=225,0,10,10,15,1,0,15,15,1,0,1,0 --mdp=3,31 --perf=0,0,0,1 -t --cbpALG=0 --fq=64 --cp=32 --al=256 --lsq=128 --iq=64 --iqnp=4 --fw=8 --dw=8 --iw=16 --rw=8 -e10000000"
+sim-collect  --sim-name size_225 > size_225.txt
+
+sim-launch --721sim ./721sim --sim-name index_6 --sim-flags "--vp-enable=1 --vp-svp=250,0,6,10,15,1,0,15,15,1,0,1,0 --mdp=3,31 --perf=0,0,0,1 -t --cbpALG=0 --fq=64 --cp=32 --al=256 --lsq=128 --iq=64 --iqnp=4 --fw=8 --dw=8 --iw=16 --rw=8 -e10000000"
+sim-collect  --sim-name index_6 > index_6.txt
+sim-launch --721sim ./721sim --sim-name index_7 --sim-flags "--vp-enable=1 --vp-svp=250,0,7,10,15,1,0,15,15,1,0,1,0 --mdp=3,31 --perf=0,0,0,1 -t --cbpALG=0 --fq=64 --cp=32 --al=256 --lsq=128 --iq=64 --iqnp=4 --fw=8 --dw=8 --iw=16 --rw=8 -e10000000"
+sim-collect  --sim-name index_7 > index_7.txt
+sim-launch --721sim ./721sim --sim-name index_8 --sim-flags "--vp-enable=1 --vp-svp=250,0,8,10,15,1,0,15,15,1,0,1,0 --mdp=3,31 --perf=0,0,0,1 -t --cbpALG=0 --fq=64 --cp=32 --al=256 --lsq=128 --iq=64 --iqnp=4 --fw=8 --dw=8 --iw=16 --rw=8 -e10000000"
+sim-collect  --sim-name index_8 > index_8.txt
+sim-launch --721sim ./721sim --sim-name index_9 --sim-flags "--vp-enable=1 --vp-svp=250,0,9,10,15,1,0,15,15,1,0,1,0 --mdp=3,31 --perf=0,0,0,1 -t --cbpALG=0 --fq=64 --cp=32 --al=256 --lsq=128 --iq=64 --iqnp=4 --fw=8 --dw=8 --iw=16 --rw=8 -e10000000"
+sim-collect  --sim-name index_9 > index_9.txt
+sim-launch --721sim ./721sim --sim-name index_10 --sim-flags "--vp-enable=1 --vp-svp=250,0,10,10,15,1,0,15,15,1,0,1,0 --mdp=3,31 --perf=0,0,0,1 -t --cbpALG=0 --fq=64 --cp=32 --al=256 --lsq=128 --iq=64 --iqnp=4 --fw=8 --dw=8 --iw=16 --rw=8 -e10000000"
+sim-collect  --sim-name index_10 > index_10.txt
+
+sim-launch --721sim ./721sim --sim-name tag_0 --sim-flags "--vp-enable=1 --vp-svp=250,0,10,0,15,1,0,15,15,1,0,1,0 --mdp=3,31 --perf=0,0,0,1 -t --cbpALG=0 --fq=64 --cp=32 --al=256 --lsq=128 --iq=64 --iqnp=4 --fw=8 --dw=8 --iw=16 --rw=8 -e10000000"
+sim-collect  --sim-name tag_0 > tag_0.txt
+sim-launch --721sim ./721sim --sim-name tag_5 --sim-flags "--vp-enable=1 --vp-svp=250,0,10,5,15,1,0,15,15,1,0,1,0 --mdp=3,31 --perf=0,0,0,1 -t --cbpALG=0 --fq=64 --cp=32 --al=256 --lsq=128 --iq=64 --iqnp=4 --fw=8 --dw=8 --iw=16 --rw=8 -e10000000"
+sim-collect  --sim-name tag_5 > tag_5.txt
+sim-launch --721sim ./721sim --sim-name tag_10 --sim-flags "--vp-enable=1 --vp-svp=250,0,10,10,15,1,0,15,15,1,0,1,0 --mdp=3,31 --perf=0,0,0,1 -t --cbpALG=0 --fq=64 --cp=32 --al=256 --lsq=128 --iq=64 --iqnp=4 --fw=8 --dw=8 --iw=16 --rw=8 -e10000000"
+sim-collect  --sim-name tag_10 > tag_10.txt
+
+sim-launch --721sim ./721sim --sim-name max_3 --sim-flags "--vp-enable=1 --vp-svp=250,0,10,10,3,1,0,15,15,1,0,1,0 --mdp=3,31 --perf=0,0,0,1 -t --cbpALG=0 --fq=64 --cp=32 --al=256 --lsq=128 --iq=64 --iqnp=4 --fw=8 --dw=8 --iw=16 --rw=8 -e10000000"
+sim-collect  --sim-name max_3 > max_3.txt
+sim-launch --721sim ./721sim --sim-name max_7 --sim-flags "--vp-enable=1 --vp-svp=250,0,10,10,7,1,0,15,15,1,0,1,0 --mdp=3,31 --perf=0,0,0,1 -t --cbpALG=0 --fq=64 --cp=32 --al=256 --lsq=128 --iq=64 --iqnp=4 --fw=8 --dw=8 --iw=16 --rw=8 -e10000000"
+sim-collect  --sim-name max_7 > max_7.txt
+sim-launch --721sim ./721sim --sim-name max_15 --sim-flags "--vp-enable=1 --vp-svp=250,0,10,10,15,1,0,15,15,1,0,1,0 --mdp=3,31 --perf=0,0,0,1 -t --cbpALG=0 --fq=64 --cp=32 --al=256 --lsq=128 --iq=64 --iqnp=4 --fw=8 --dw=8 --iw=16 --rw=8 -e10000000"
+sim-collect  --sim-name max_15 > max_15.txt
+
+sim-launch --721sim ./721sim --sim-name inc_1 --sim-flags "--vp-enable=1 --vp-svp=250,0,10,10,15,1,0,15,15,1,0,1,0 --mdp=3,31 --perf=0,0,0,1 -t --cbpALG=0 --fq=64 --cp=32 --al=256 --lsq=128 --iq=64 --iqnp=4 --fw=8 --dw=8 --iw=16 --rw=8 -e10000000"
+sim-collect  --sim-name inc_1 > inc_1.txt
+sim-launch --721sim ./721sim --sim-name inc_2 --sim-flags "--vp-enable=1 --vp-svp=250,0,10,10,15,2,0,15,15,1,0,1,0 --mdp=3,31 --perf=0,0,0,1 -t --cbpALG=0 --fq=64 --cp=32 --al=256 --lsq=128 --iq=64 --iqnp=4 --fw=8 --dw=8 --iw=16 --rw=8 -e10000000"
+sim-collect  --sim-name inc_2 > inc_2.txt
+sim-launch --721sim ./721sim --sim-name inc_3 --sim-flags "--vp-enable=1 --vp-svp=250,0,10,10,15,3,0,15,15,1,0,1,0 --mdp=3,31 --perf=0,0,0,1 -t --cbpALG=0 --fq=64 --cp=32 --al=256 --lsq=128 --iq=64 --iqnp=4 --fw=8 --dw=8 --iw=16 --rw=8 -e10000000"
+sim-collect  --sim-name inc_3 > inc_3.txt
+
+sim-launch --721sim ./721sim --sim-name dec_0 --sim-flags "--vp-enable=1 --vp-svp=250,0,10,10,15,1,0,15,15,1,0,1,0 --mdp=3,31 --perf=0,0,0,1 -t --cbpALG=0 --fq=64 --cp=32 --al=256 --lsq=128 --iq=64 --iqnp=4 --fw=8 --dw=8 --iw=16 --rw=8 -e10000000"
+sim-collect  --sim-name dec_0 > dec_0.txt
+sim-launch --721sim ./721sim --sim-name dec_1 --sim-flags "--vp-enable=1 --vp-svp=250,0,10,10,15,1,1,15,15,1,0,1,0 --mdp=3,31 --perf=0,0,0,1 -t --cbpALG=0 --fq=64 --cp=32 --al=256 --lsq=128 --iq=64 --iqnp=4 --fw=8 --dw=8 --iw=16 --rw=8 -e10000000"
+sim-collect  --sim-name dec_1 > dec_1.txt
+sim-launch --721sim ./721sim --sim-name dec_2 --sim-flags "--vp-enable=1 --vp-svp=250,0,10,10,15,1,2,15,15,1,0,1,0 --mdp=3,31 --perf=0,0,0,1 -t --cbpALG=0 --fq=64 --cp=32 --al=256 --lsq=128 --iq=64 --iqnp=4 --fw=8 --dw=8 --iw=16 --rw=8 -e10000000"
+sim-collect  --sim-name dec_2 > dec_2.txt
+sim-launch --721sim ./721sim --sim-name dec_3 --sim-flags "--vp-enable=1 --vp-svp=250,0,10,10,15,1,3,15,15,1,0,1,0 --mdp=3,31 --perf=0,0,0,1 -t --cbpALG=0 --fq=64 --cp=32 --al=256 --lsq=128 --iq=64 --iqnp=4 --fw=8 --dw=8 --iw=16 --rw=8 -e10000000"
+sim-collect  --sim-name dec_3 > dec_3.txt
+
+sim-launch --721sim ./721sim --sim-name stride_3 --sim-flags "--vp-enable=1 --vp-svp=250,0,10,10,15,1,0,3,15,1,0,1,0 --mdp=3,31 --perf=0,0,0,1 -t --cbpALG=0 --fq=64 --cp=32 --al=256 --lsq=128 --iq=64 --iqnp=4 --fw=8 --dw=8 --iw=16 --rw=8 -e10000000"
+sim-collect  --sim-name stride_3 > stride_3.txt
+sim-launch --721sim ./721sim --sim-name stride_7 --sim-flags "--vp-enable=1 --vp-svp=250,0,10,10,15,1,0,7,15,1,0,1,0 --mdp=3,31 --perf=0,0,0,1 -t --cbpALG=0 --fq=64 --cp=32 --al=256 --lsq=128 --iq=64 --iqnp=4 --fw=8 --dw=8 --iw=16 --rw=8 -e10000000"
+sim-collect  --sim-name stride_7 > stride_7.txt
+sim-launch --721sim ./721sim --sim-name stride_15 --sim-flags "--vp-enable=1 --vp-svp=250,0,10,10,15,1,0,15,15,1,0,1,0 --mdp=3,31 --perf=0,0,0,1 -t --cbpALG=0 --fq=64 --cp=32 --al=256 --lsq=128 --iq=64 --iqnp=4 --fw=8 --dw=8 --iw=16 --rw=8 -e10000000"
+sim-collect  --sim-name stride_15 > stride_15.txt
+
+sim-launch --721sim ./721sim --sim-name replace_3 --sim-flags "--vp-enable=1 --vp-svp=250,0,10,10,15,1,0,15,3,1,0,1,0 --mdp=3,31 --perf=0,0,0,1 -t --cbpALG=0 --fq=64 --cp=32 --al=256 --lsq=128 --iq=64 --iqnp=4 --fw=8 --dw=8 --iw=16 --rw=8 -e10000000"
+sim-collect  --sim-name replace_3 > replace_3.txt
+sim-launch --721sim ./721sim --sim-name replace_7 --sim-flags "--vp-enable=1 --vp-svp=250,0,10,10,15,1,0,15,7,1,0,1,0 --mdp=3,31 --perf=0,0,0,1 -t --cbpALG=0 --fq=64 --cp=32 --al=256 --lsq=128 --iq=64 --iqnp=4 --fw=8 --dw=8 --iw=16 --rw=8 -e10000000"
+sim-collect  --sim-name replace_7 > replace_7.txt
+sim-launch --721sim ./721sim --sim-name replace_15 --sim-flags "--vp-enable=1 --vp-svp=250,0,10,10,15,1,0,15,15,1,0,1,0 --mdp=3,31 --perf=0,0,0,1 -t --cbpALG=0 --fq=64 --cp=32 --al=256 --lsq=128 --iq=64 --iqnp=4 --fw=8 --dw=8 --iw=16 --rw=8 -e10000000"
+sim-collect  --sim-name replace_15 > replace_15.txt
+
