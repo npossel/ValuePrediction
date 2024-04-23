@@ -361,7 +361,7 @@ void pipeline_t::dispatch() {
       }
 
       // Checkpointed branches must record information for restoring the LQ/SQ when a branch misprediction resolves.
-      if (PAY.buf[index].checkpoint || PAY.buf[index].confident) {
+      if (PAY.buf[index].checkpoint || (PAY.buf[index].confident && !IS_LOAD(PAY.buf[index].flags))) {
          LSU.checkpoint(PAY.buf[index].LQ_index, PAY.buf[index].LQ_phase, PAY.buf[index].SQ_index, PAY.buf[index].SQ_phase);
       }
    }

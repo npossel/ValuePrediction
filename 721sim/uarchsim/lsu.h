@@ -190,7 +190,8 @@ public:
   void checkpoint(unsigned int& chkpt_lq_tail, bool& chkpt_lq_tail_phase,
                   unsigned int& chkpt_sq_tail, bool& chkpt_sq_tail_phase);
   void restore(unsigned int recover_lq_tail, bool recover_lq_tail_phase,
-               unsigned int recover_sq_tail, bool recover_sq_tail_phase);
+               unsigned int recover_sq_tail, bool recover_sq_tail_phase,
+               bool is_load);
 
   void train(bool load);
   bool commit(bool load, bool atomic_op);

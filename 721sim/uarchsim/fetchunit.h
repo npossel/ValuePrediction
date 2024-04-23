@@ -173,7 +173,7 @@ public:
 	//   the branch predictors when they commit).
 	//
 	// The caller passes in the DECODE pipeline register so that this function can transfer the fetch bundle to it.
-	bool fetch2(pipeline_register DECODE[], vp* VP);
+	bool fetch2(pipeline_register DECODE[]);
 
 	// A mispredicted branch was detected.
 	// 1. Roll-back the branch queue to the mispredicted branch's entry.
@@ -184,6 +184,7 @@ public:
 	// 6. Go active again, whether or not currently active (restore fetch_active).
 	// 7. Squash the fetch2_status register and FETCH2 pipeline register.
 	void mispredict(uint64_t branch_pred_tag, bool taken, uint64_t next_pc);
+	void mispredictVP(uint64_t branch_pred_tag, uint64_t next_pc);
 
 	// Commit the indicated branch from the branch queue.
 	// We assert that it is at the head.

@@ -3,6 +3,7 @@
 
 void pipeline_t::writeback(unsigned int lane_number) {
    unsigned int index;
+   bool is_load;
 
    // Check if there is an instruction in the Writeback Stage of the specified Execution Lane.
    if (Execution_Lanes[lane_number].wb.valid) {
@@ -127,7 +128,8 @@ void pipeline_t::writeback(unsigned int lane_number) {
             // FIX_ME #15c END
 
             // Restore the LQ/SQ.
-            LSU.restore(PAY.buf[index].LQ_index, PAY.buf[index].LQ_phase, PAY.buf[index].SQ_index, PAY.buf[index].SQ_phase);
+            is_load = IS_LOAD(PAY.buf[index].flags);
+            LSU.restore(PAY.buf[index].LQ_index, PAY.buf[index].LQ_phase, PAY.buf[index].SQ_index, PAY.buf[index].SQ_phase, is_load);
 
             // FIX_ME #15d
             // Squash instructions after the branch in program order, in all pipeline registers and the IQ.
@@ -167,9 +169,8 @@ void pipeline_t::writeback(unsigned int lane_number) {
                     true);
          }
          else {
-            FetchUnit->mispredictVAL(PAY.buf[index].pred_tag,
-                                  PAY.buf[index].C_value.dw,
-                                  PAY.buf[index].c_next_pc)
+            FetchUnit->mispredictVP(PAY.buf[index].pred_tag,
+                                     PAY.buf[index].c_next_pc);
          }
       }
 

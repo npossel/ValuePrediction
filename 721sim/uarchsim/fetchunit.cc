@@ -284,13 +284,14 @@ void fetchunit_t::fetch1(cycle_t cycle) {
 // Fetch2 pipeline stage.
 // If it returns true: call fetchunit_t::fetch1() after.
 // If it returns false: do NOT call fetchunit_t::fetch1() after, because of a misfetch recovery.
-bool fetchunit_t::fetch2(pipeline_register DECODE[], vp* VP) {
+bool fetchunit_t::fetch2(pipeline_register DECODE[]) {
    uint64_t pos;	// position of instruction in the fetch bundle
    uint64_t index;	// PAY index
    bool exception;	// if true, an exception was found in the fetch bundle
    bool serialize;	// if true, a serializing instruction was found in the fetch bundle
    bool misfetch;	// if true, the instruction cache supplied a misfetched bundle (details below)
    bool is_branch_insn;
+   bool eligible;
 
    // Do nothing if there isn't a fetch bundle in the Fetch2 stage.
    if (!fetch2_status.valid) {
@@ -542,10 +543,20 @@ bool fetchunit_t::fetch2(pipeline_register DECODE[], vp* VP) {
 	 RBP->log_branch(pred_tag, bq.bq[pred_tag].branch_type, taken, bq.bq[pred_tag].fetch_pc, bq.bq[pred_tag].next_pc);
       }
 
-      if(VP->eligible(PAY->buf[index].flags)) {
-         pred_tag_VP = bq.get_pred_tag();
-         pred_tag_phase_VP = bq.get_pred_phase();
-         PAY->buf[index].pred_tag = ((pred_tag_VP << 1) | (pred_tag_phase_VP ? 1 : 0));
+      if (IS_INTALU(PAY->buf[index].flags))
+         eligible = PREDINTALU;     // instr. is INTALU type.  It is eligible if predINTALU is configured "true".
+      else if (IS_FPALU(PAY->buf[index].flags))
+         eligible = PREDFPALU;      // instr. is FPALU type.  It is eligible if predFPALU is configured "true".
+      else if (IS_LOAD(PAY->buf[index].flags) && !IS_AMO(PAY->buf[index].flags))
+         eligible = PREDLOAD;      // instr. is a normal LOAD (not rare load-with-reserv).  It is eligible if predLOAD is configured "true".
+      else
+         eligible = false;     // instr. is none of the above major types, so it is never eligible
+
+      if(eligible) {
+         bq.push(pred_tag, pred_tag_phase);
+         // pred_tag_VP = bq.get_pred_tag();
+         // pred_tag_phase_VP = bq.get_pred_phase();
+         PAY->buf[index].pred_tag = ((pred_tag << 1) | (pred_tag_phase ? 1 : 0));
       }
 
       // Go to next instruction in the fetch bundle.
@@ -616,6 +627,32 @@ void fetchunit_t::mispredict(uint64_t branch_pred_tag, bool taken, uint64_t next
    squash_fetch2();
 }
 
+void fetchunit_t::mispredictVP(uint64_t branch_pred_tag, uint64_t next_pc) {
+     // Extract the pred_tag and pred_tag_phase from the unified branch_pred_tag.
+
+   uint64_t pred_tag = (branch_pred_tag >> 1);
+   bool pred_tag_phase = (((branch_pred_tag & 1) == 1) ? true : false);
+
+   // 1. Roll-back the branch queue to the mispredicted branch's entry.
+   //    Then push the branch back onto it.
+
+   bq.rollback(pred_tag, pred_tag_phase, true);
+
+   uint64_t temp_pred_tag;
+   bool temp_pred_tag_phase;
+   // bq.push(temp_pred_tag, temp_pred_tag_phase);	// Need to push the branch back onto the branch queue.
+   // assert((temp_pred_tag == pred_tag) && (temp_pred_tag_phase == pred_tag_phase));
+
+    pc = next_pc;
+
+   // 6. Go active again, whether or not currently active (restore fetch_active).
+
+   fetch_active = true;
+
+   // 7. Squash the fetch2_status register and FETCH2 pipeline register.
+
+   squash_fetch2();
+}
 
 // Commit the indicated branch from the branch queue.
 // We assert that it is at the head.
