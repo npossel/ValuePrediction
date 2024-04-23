@@ -173,7 +173,7 @@ public:
 	//   the branch predictors when they commit).
 	//
 	// The caller passes in the DECODE pipeline register so that this function can transfer the fetch bundle to it.
-	bool fetch2(pipeline_register DECODE[]);
+	bool fetch2(pipeline_register DECODE[], vp* VP);
 
 	// A mispredicted branch was detected.
 	// 1. Roll-back the branch queue to the mispredicted branch's entry.

@@ -38,5 +38,7 @@ public:
 	void rollback(uint64_t pred_tag, bool pred_tag_phase, bool do_checks);
 	void mark(uint64_t &pred_tag, bool &pred_tag_phase);
 	uint64_t flush();
+	uint64_t get_pred_tag() {return tail;}
+	bool get_pred_phase() {return tail_phase;}
 };
 

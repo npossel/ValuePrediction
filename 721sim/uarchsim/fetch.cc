@@ -16,7 +16,7 @@ void pipeline_t::fetch() {
    // discarding the bundle that it would have fetched after the misfetched bundle. We model this discard by not clocking Fetch1 this cycle.
    // It will get clocked in the next cycle and that models repredicting the misfetched bundle in the next cycle.
 
-   if (FetchUnit->fetch2(DECODE))	// The DECODE[] pipeline register is passed in so that the Fetch2 stage can advance its bundle to the Decode stage.
+   if (FetchUnit->fetch2(DECODE, VP))	// The DECODE[] pipeline register is passed in so that the Fetch2 stage can advance its bundle to the Decode stage.
       FetchUnit->fetch1(cycle);		// The current cycle is passed in so that the Fetch1 stage can model the cycle at which an instruction cache miss resolves.
 
 }			// fetch()

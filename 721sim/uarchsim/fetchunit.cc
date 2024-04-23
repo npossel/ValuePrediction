@@ -284,7 +284,7 @@ void fetchunit_t::fetch1(cycle_t cycle) {
 // Fetch2 pipeline stage.
 // If it returns true: call fetchunit_t::fetch1() after.
 // If it returns false: do NOT call fetchunit_t::fetch1() after, because of a misfetch recovery.
-bool fetchunit_t::fetch2(pipeline_register DECODE[]) {
+bool fetchunit_t::fetch2(pipeline_register DECODE[], vp* VP) {
    uint64_t pos;	// position of instruction in the fetch bundle
    uint64_t index;	// PAY index
    bool exception;	// if true, an exception was found in the fetch bundle
@@ -480,7 +480,9 @@ bool fetchunit_t::fetch2(pipeline_register DECODE[]) {
 
    bool taken;		// taken/not-taken prediction for the current conditional branch (where we are at in the fetch bundle)
    uint64_t pred_tag;	// pred_tag is the index into the branch queue for the newly pushed branch
+   uint64_t pred_tag_VP;
    bool pred_tag_phase;	// this will get appended to pred_tag so that the user interacts with the Fetch Unit via a single number
+   bool pred_tag_phase_VP;
    uint64_t fetch_cbID_in_bundle = 0; // Identifies which conditional branch (cb) in the fetch bundle: 0 (first cb), 1 (second cb), etc.
 
    // Prepare the predictors for logging context at each branch.
@@ -538,6 +540,12 @@ bool fetchunit_t::fetch2(pipeline_register DECODE[]) {
 	 CBP->log_branch(pred_tag, bq.bq[pred_tag].branch_type, taken, bq.bq[pred_tag].fetch_pc, bq.bq[pred_tag].next_pc);
 	 IBP->log_branch(pred_tag, bq.bq[pred_tag].branch_type, taken, bq.bq[pred_tag].fetch_pc, bq.bq[pred_tag].next_pc);
 	 RBP->log_branch(pred_tag, bq.bq[pred_tag].branch_type, taken, bq.bq[pred_tag].fetch_pc, bq.bq[pred_tag].next_pc);
+      }
+
+      if(VP->eligible(PAY->buf[index].flags)) {
+         pred_tag_VP = bq.get_pred_tag();
+         pred_tag_phase_VP = bq.get_pred_phase();
+         PAY->buf[index].pred_tag = ((pred_tag_VP << 1) | (pred_tag_phase_VP ? 1 : 0));
       }
 
       // Go to next instruction in the fetch bundle.

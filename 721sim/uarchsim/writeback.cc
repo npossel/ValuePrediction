@@ -153,6 +153,25 @@ void pipeline_t::writeback(unsigned int lane_number) {
             PAY.rollback(index);
          }
       }
+      if(PAY.buf[index].confident) {
+         if(VP->get_perf()) {
+            REN->resolve(PAY.buf[index].AL_index,
+                         PAY.buf[index].branch_ID,
+                         true);
+         }
+         else if(PAY.buf[index].correct) {
+            REN->resolve(PAY.buf[index].AL_index,
+                         PAY.buf[index].branch_ID,
+                         true);
+            resolve(PAY.buf[index].branch_ID,
+                    true);
+         }
+         else {
+            FetchUnit->mispredictVAL(PAY.buf[index].pred_tag,
+                                  PAY.buf[index].C_value.dw,
+                                  PAY.buf[index].c_next_pc)
+         }
+      }
 
       //////////////////////////////////////////////////////////////////////////////////////////////////////////
       // FIX_ME #16
