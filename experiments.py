@@ -29,7 +29,7 @@ for item in vpq_size:
     collect = "sim-collect " + name + " > " + name_file
     call(collect, shell=True)
     file1 = open(name_file, "r+")
-    lines = file.readlines()
+    lines = file1.readlines()
     ipc = 0.0
     for i in range(1, len(lines)):
         temp = lines[i].split(",")
@@ -50,7 +50,7 @@ for item in index_bits:
     collect = "sim-collect " + name + " > " + name_file
     call(collect, shell=True)
     file1 = open(name_file, "r+")
-    lines = file.readlines()
+    lines = file1.readlines()
     ipc = 0.0
     for i in range(1, len(lines)):
         temp = lines[i].split(",")
@@ -71,7 +71,7 @@ for item in tag_bits:
     collect = "sim-collect " + name + " > " + name_file
     call(collect, shell=True)
     file1 = open(name_file, "r+")
-    lines = file.readlines()
+    lines = file1.readlines()
     ipc = 0.0
     for i in range(1, len(lines)):
         temp = lines[i].split(",")
@@ -92,7 +92,7 @@ for item in confmax:
     collect = "sim-collect " + name + " > " + name_file
     call(collect, shell=True)
     file1 = open(name_file, "r+")
-    lines = file.readlines()
+    lines = file1.readlines()
     ipc = 0.0
     for i in range(1, len(lines)):
         temp = lines[i].split(",")
@@ -113,7 +113,7 @@ for item in confinc:
     collect = "sim-collect " + name + " > " + name_file
     call(collect, shell=True)
     file1 = open(name_file, "r+")
-    lines = file.readlines()
+    lines = file1.readlines()
     ipc = 0.0
     for i in range(1, len(lines)):
         temp = lines[i].split(",")
@@ -134,7 +134,7 @@ for item in confdec:
     collect = "sim-collect " + name + " > " + name_file
     call(collect, shell=True)
     file1 = open(name_file, "r+")
-    lines = file.readlines()
+    lines = file1.readlines()
     ipc = 0.0
     for i in range(1, len(lines)):
         temp = lines[i].split(",")
@@ -155,7 +155,7 @@ for item in replace_stride:
     collect = "sim-collect " + name + " > " + name_file
     call(collect, shell=True)
     file1 = open(name_file, "r+")
-    lines = file.readlines()
+    lines = file1.readlines()
     ipc = 0.0
     for i in range(1, len(lines)):
         temp = lines[i].split(",")
@@ -176,7 +176,7 @@ for item in replace:
     collect = "sim-collect " + name + " > " + name_file
     call(collect, shell=True)
     file1 = open(name_file, "r+")
-    lines = file.readlines()
+    lines = file1.readlines()
     ipc = 0.0
     for i in range(1, len(lines)):
         temp = lines[i].split(",")
