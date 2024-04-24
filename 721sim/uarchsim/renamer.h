@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <assert.h>
 #include <numeric>
+#include <string>
 
 class checkpointlist {
 public:
@@ -172,6 +173,18 @@ private:
 	// Private functions.
 	// e.g., a generic function to copy state from one map to another.
 	/////////////////////////////////////////////////////////////////////
+	std::string gbm_format(uint64_t gbm){
+        std::string format_thing;
+        for(int i = 31; i > -1; i--){
+            uint64_t compare = 1 << i;
+            if(compare & gbm){
+                format_thing += "1";
+            }else{
+                format_thing += "0";
+            }
+        }
+        return format_thing;
+    }
 
 public:
 	////////////////////////////////////////

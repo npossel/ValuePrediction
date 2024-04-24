@@ -4,7 +4,7 @@ renamer::renamer(uint64_t n_log_regs, uint64_t n_phys_regs, uint64_t n_branches,
         uint64_t n_active) {
     // Assertions for various user defined variables
     assert(n_phys_regs>n_log_regs);
-    assert(1<=n_branches<=64);
+    assert(1<=n_branches && n_branches<=64);
     assert(n_active>0);
 
     //set private variables equal to the user defined variables
@@ -226,6 +226,8 @@ void renamer::resolve(uint64_t AL_index, uint64_t branch_ID, bool correct) {
     // Clear branch's bit in GBM to 0
     uint64_t mask;
     mask = ~(1ULL << branch_ID);
+    const char *test = gbm_format(GBM).c_str();
+    printf("we are in resolve. gbm = %s\n", test);
     if(correct) {
         GBM = GBM & mask;
 
@@ -237,6 +239,8 @@ void renamer::resolve(uint64_t AL_index, uint64_t branch_ID, bool correct) {
         }
         // Clear occupied position in bc
         bc[branch_ID].occ=0;
+        test = gbm_format(GBM).c_str();
+        printf("correct gbm = %s\n", test);
     }
     else {
     // Restore and clear GBM
@@ -278,6 +282,8 @@ void renamer::resolve(uint64_t AL_index, uint64_t branch_ID, bool correct) {
                 bc[i].occ=0;
             }
         }
+        test = gbm_format(GBM).c_str();
+        printf("wrong prediction corrected gbm = %s\n", test);
     }
 }
 
