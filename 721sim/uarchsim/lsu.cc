@@ -599,15 +599,25 @@ void lsu::checkpoint(unsigned int& chkpt_lq_tail, bool& chkpt_lq_tail_phase,
 
 
 void lsu::restore(unsigned int recover_lq_tail, bool recover_lq_tail_phase,
-                  unsigned int recover_sq_tail, bool recover_sq_tail_phase) {
+                  unsigned int recover_sq_tail, bool recover_sq_tail_phase,
+				  bool is_load) {
 	/////////////////////////////
 	// Restore LQ.
 	/////////////////////////////
 
 	// Restore tail state.
-	lq_tail = recover_lq_tail;
-	lq_tail_phase = recover_lq_tail_phase;
-
+	if(is_load) {
+		lq_tail = recover_lq_tail+1;
+		lq_tail_phase = recover_lq_tail_phase;
+		if(lq_tail == lq_size) {
+			lq_tail = 0;
+			lq_tail_phase = !lq_tail_phase;
+		}
+	}
+	else {
+		lq_tail = recover_lq_tail;
+		lq_tail_phase = recover_lq_tail_phase;
+	}
 	// Recompute the length.
 	lq_length = MOD_S((lq_size + lq_tail - lq_head), lq_size);
 	if ((lq_length == 0) && (lq_tail_phase != lq_head_phase)) {

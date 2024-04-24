@@ -3,6 +3,7 @@
 
 void pipeline_t::writeback(unsigned int lane_number) {
    unsigned int index;
+   bool is_load;
 
    // Check if there is an instruction in the Writeback Stage of the specified Execution Lane.
    if (Execution_Lanes[lane_number].wb.valid) {
@@ -127,7 +128,8 @@ void pipeline_t::writeback(unsigned int lane_number) {
             // FIX_ME #15c END
 
             // Restore the LQ/SQ.
-            LSU.restore(PAY.buf[index].LQ_index, PAY.buf[index].LQ_phase, PAY.buf[index].SQ_index, PAY.buf[index].SQ_phase);
+            is_load = IS_LOAD(PAY.buf[index].flags);
+            LSU.restore(PAY.buf[index].LQ_index, PAY.buf[index].LQ_phase, PAY.buf[index].SQ_index, PAY.buf[index].SQ_phase, is_load);
 
             // FIX_ME #15d
             // Squash instructions after the branch in program order, in all pipeline registers and the IQ.
@@ -151,6 +153,43 @@ void pipeline_t::writeback(unsigned int lane_number) {
 
             // Rollback PAY to the point of the branch.
             PAY.rollback(index);
+         }
+      }
+      if(PAY.buf[index].confident) {
+         if(VP->get_perf()) {
+            printf("WRITEBACK: PERFECT!\n");
+            REN->resolve(PAY.buf[index].AL_index,
+                         PAY.buf[index].branch_ID,
+                         true);
+         }
+         else if(PAY.buf[index].correct) {
+            printf("WRITEBACK: CORRECT!\n");
+            REN->resolve(PAY.buf[index].AL_index,
+                         PAY.buf[index].branch_ID,
+                         true);
+            resolve(PAY.buf[index].branch_ID,
+                    true);
+            printf("WRITEBACK: AFTER CORRECT\n");
+         }
+         else {
+            printf("\nWRITEBACK: WE ARE MISPREDICT!!!!!!!!!!!!!!!!\n");
+            FetchUnit->mispredictVP(PAY.buf[index].pred_tag,
+                                     PAY.buf[index].c_next_pc);
+
+            REN->resolve(PAY.buf[index].AL_index,
+                         PAY.buf[index].branch_ID,
+                         false);
+
+            is_load = IS_LOAD(PAY.buf[index].flags);
+            LSU.restore(PAY.buf[index].LQ_index, PAY.buf[index].LQ_phase, PAY.buf[index].SQ_index, PAY.buf[index].SQ_phase, is_load);
+
+            resolve(PAY.buf[index].branch_ID,
+                    false);
+
+            VP->restore(PAY.buf[index].cpt_vpq_tail, PAY.buf[index].cpt_tail_phase);
+
+            PAY.rollback(index);
+            printf("\nWRITEBACK: AFTER MISPREDICT!!\n");
          }
       }
 

@@ -49,7 +49,7 @@ void pipeline_t::rename1() {
 void pipeline_t::rename2() {
    unsigned int i;
    unsigned int index;
-   unsigned int bundle_dst, bundle_branch, bundle_instr;
+   unsigned int bundle_dst, bundle_branch, bundle_instr, bundle_confident, bundle_total;
    bool enable;
    bool vpq_size;
    bool eligible;
@@ -74,6 +74,8 @@ void pipeline_t::rename2() {
    bundle_dst = 0;
    bundle_branch = 0;
    bundle_instr = 0;
+   bundle_confident = 0;
+   bundle_total = 0;
    for (i = 0; i < dispatch_width; i++) {
       if (!RENAME2[i].valid)
          break;			// Not a valid instruction: Reached the end of the rename bundle so exit loop.
@@ -102,17 +104,10 @@ void pipeline_t::rename2() {
       // FIX_ME #1 END
       // Count the number of eligible instructions to value predict
       if(VP->eligible(PAY.buf[index].flags)){
-//        if(IS_LOAD(PAY.buf[index].flags) && !IS_AMO(PAY.buf[index].flags)){
-//            printf("load here\n");
-//        }
-//        if(IS_INTALU(PAY.buf[index].flags)){
-//            printf("int alu here\n");
-//        }
-//        if(IS_FPALU(PAY.buf[index].flags)){
-//            printf("fp here\n");
-//        }
           bundle_instr++;
       }
+      if(VP->get_confidence(PAY.buf[index].pc))
+         bundle_confident++;
    }
 //    printf("\n we outside\n");
    // FIX_ME #2
@@ -126,7 +121,9 @@ void pipeline_t::rename2() {
    // This is achieved by doing nothing and proceeding to the next statements.
 
    // FIX_ME #2 BEGIN
-   if(REN->stall_branch(bundle_branch))
+
+   bundle_total = bundle_branch + bundle_confident;
+   if(REN->stall_branch(bundle_total))
       return;
    if(REN->stall_reg(bundle_dst))
       return;
@@ -134,9 +131,10 @@ void pipeline_t::rename2() {
 
    // Stall if the policy is to stall and there aren't enough entries available
    if(!perf && !VP->get_policy() && VP->stall_vpq(bundle_instr)){
-      // printf("\nSTALLING!!\nBundle size = %u", bundle_instr);
+      printf("\nSTALLING!!\nBundle size = %u", bundle_instr);
       return;
    }
+
    //
    // Sufficient resources are available to rename the rename bundle.
    //
@@ -266,10 +264,13 @@ void pipeline_t::rename2() {
       //    so that the branch ID can be used in subsequent pipeline stages.
 
       // FIX_ME #5 BEGIN
-      if(PAY.buf[index].checkpoint) {
+      if(PAY.buf[index].checkpoint || PAY.buf[index].confident) {
+         printf("BEFORE RENAME!!\n");
          PAY.buf[index].branch_ID = REN->checkpoint();
+         printf("after checkpoint\n");
          PAY.buf[index].cpt_vpq_tail = VP->get_tail();
          PAY.buf[index].cpt_tail_phase = VP->get_tail_phase();
+         printf("AFTER RENAME STUFF!!\n");
       }
       // FIX_ME #5 END
    }

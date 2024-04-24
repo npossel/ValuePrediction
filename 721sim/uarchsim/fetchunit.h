@@ -109,6 +109,8 @@ private:
 
 	uint64_t meas_btbmiss;		// # of btb misses, i.e., number of discarded fetch bundles (idle fetch cycles) due to a btb miss within the bundle
 
+	uint64_t pred_tag_VP = 0;
+	bool pred_tag_phase_VP = false;
 	////////////////////////////
 	// Private functions.
 	////////////////////////////
@@ -184,6 +186,7 @@ public:
 	// 6. Go active again, whether or not currently active (restore fetch_active).
 	// 7. Squash the fetch2_status register and FETCH2 pipeline register.
 	void mispredict(uint64_t branch_pred_tag, bool taken, uint64_t next_pc);
+	void mispredictVP(uint64_t branch_pred_tag, uint64_t next_pc);
 
 	// Commit the indicated branch from the branch queue.
 	// We assert that it is at the head.

@@ -104,8 +104,10 @@ uint64_t renamer::rename_rdst(uint64_t log_reg) {
 uint64_t renamer::checkpoint() {
     // Iterate through the GBM to find a free bit. Once found, the ID is set to that
     // position and the bit is flipped. The branch checkpoint is then updated at the
-    // corresponding location in the bc. 
+    // corresponding location in the bc.
+    printf("We are in checkpoint\n"); 
     uint64_t ID=2000;
+    printf("we are before the for loop. branches = %lu\n", branches);
     for(uint64_t i=branches-1;i>=0;i--) {
         uint64_t mask = 1ULL << i;
         if(mask & GBM) {}
@@ -115,6 +117,7 @@ uint64_t renamer::checkpoint() {
             break;
         }
     }
+    printf("we are after the for loop. ID = %lu\n", ID);
     assert(ID!=2000);
     bc[ID].smt = rmt;
     bc[ID].fl_h = fl_h;
