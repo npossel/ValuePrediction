@@ -109,6 +109,8 @@ private:
 
 	uint64_t meas_btbmiss;		// # of btb misses, i.e., number of discarded fetch bundles (idle fetch cycles) due to a btb miss within the bundle
 
+	uint64_t pred_tag_VP = 0;
+	bool pred_tag_phase_VP = false;
 	////////////////////////////
 	// Private functions.
 	////////////////////////////

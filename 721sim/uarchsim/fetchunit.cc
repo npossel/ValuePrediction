@@ -481,9 +481,7 @@ bool fetchunit_t::fetch2(pipeline_register DECODE[]) {
 
    bool taken;		// taken/not-taken prediction for the current conditional branch (where we are at in the fetch bundle)
    uint64_t pred_tag;	// pred_tag is the index into the branch queue for the newly pushed branch
-   uint64_t pred_tag_VP;
    bool pred_tag_phase;	// this will get appended to pred_tag so that the user interacts with the Fetch Unit via a single number
-   bool pred_tag_phase_VP;
    uint64_t fetch_cbID_in_bundle = 0; // Identifies which conditional branch (cb) in the fetch bundle: 0 (first cb), 1 (second cb), etc.
 
    // Prepare the predictors for logging context at each branch.
@@ -502,61 +500,80 @@ bool fetchunit_t::fetch2(pipeline_register DECODE[]) {
       index = FETCH2[pos].index;
 
       if (PAY->buf[index].branch) {
-	 // Push an entry into the branch queue.
-	 // This merely allocates the entry; below, we set the entry's contents.
-	 bq.push(pred_tag, pred_tag_phase);
+         // Push an entry into the branch queue.
+         // This merely allocates the entry; below, we set the entry's contents.
+         bq.push(pred_tag, pred_tag_phase);
+         pred_tag_VP = pred_tag;
+         pred_tag_phase_VP = pred_tag_phase;
 
-	 // Merge the pred_tag and pred_tag_phase into a single pred_tag, and assign it to the instruction.
-	 PAY->buf[index].pred_tag = ((pred_tag << 1) | (pred_tag_phase ? 1 : 0));
+         // Merge the pred_tag and pred_tag_phase into a single pred_tag, and assign it to the instruction.
+         PAY->buf[index].pred_tag = ((pred_tag << 1) | (pred_tag_phase ? 1 : 0));
 
-	 //////////////////////////////////////////////
-	 // Set fields in the new branch queue entry.
-	 //////////////////////////////////////////////
+         printf("\nIN FETCH2 | full tag with phase checkpointed for predicted branch: %lu\n", ((pred_tag << 1) | (pred_tag_phase ? 1 : 0)));
 
-	 // The type of branch.
-	 bq.bq[pred_tag].branch_type = PAY->buf[index].branch_type;
+         //////////////////////////////////////////////
+         // Set fields in the new branch queue entry.
+         //////////////////////////////////////////////
 
-	 // Information about the fetch bundle that contains this branch.
-	 bq.bq[pred_tag].fetch_pc = fetch2_status.pc;  // Start PC of the fetch bundle that contains this branch.
-	 if (PAY->buf[index].branch_type == BTB_BRANCH) {
-	    bq.bq[pred_tag].fetch_cbID_in_bundle = fetch_cbID_in_bundle;  // This conditional branch's ID in the fetch bundle: 0 (first cb), 1 (second cb), etc.
-	    fetch_cbID_in_bundle++;  // Increment the ID for the next conditional branch in the fetch bundle.
-         }
-         else {
-	    bq.bq[pred_tag].fetch_cbID_in_bundle = 0;
-         }
+         // The type of branch.
+         bq.bq[pred_tag].branch_type = PAY->buf[index].branch_type;
 
-	 // Initialize the misp. flag to indicate, as far as we know at this point, the branch is not mispredicted.
-	 bq.bq[pred_tag].misp = false;
+         // Information about the fetch bundle that contains this branch.
+         bq.bq[pred_tag].fetch_pc = fetch2_status.pc;  // Start PC of the fetch bundle that contains this branch.
+         if (PAY->buf[index].branch_type == BTB_BRANCH) {
+            bq.bq[pred_tag].fetch_cbID_in_bundle = fetch_cbID_in_bundle;  // This conditional branch's ID in the fetch bundle: 0 (first cb), 1 (second cb), etc.
+            fetch_cbID_in_bundle++;  // Increment the ID for the next conditional branch in the fetch bundle.
+               }
+               else {
+            bq.bq[pred_tag].fetch_cbID_in_bundle = 0;
+               }
 
-	 // Record the prediction.
-	 taken = (PAY->buf[index].next_pc != INCREMENT_PC(PAY->buf[index].pc));
-	 bq.bq[pred_tag].taken = taken;
-	 bq.bq[pred_tag].next_pc = PAY->buf[index].next_pc;
+         // Initialize the misp. flag to indicate, as far as we know at this point, the branch is not mispredicted.
+         bq.bq[pred_tag].misp = false;
 
-	 //////////////////////////////////////////////
-	 // Log the branch in the predictors' logs.
-	 //////////////////////////////////////////////
+         // Record the prediction.
+         taken = (PAY->buf[index].next_pc != INCREMENT_PC(PAY->buf[index].pc));
+         bq.bq[pred_tag].taken = taken;
+         bq.bq[pred_tag].next_pc = PAY->buf[index].next_pc;
 
-	 CBP->log_branch(pred_tag, bq.bq[pred_tag].branch_type, taken, bq.bq[pred_tag].fetch_pc, bq.bq[pred_tag].next_pc);
-	 IBP->log_branch(pred_tag, bq.bq[pred_tag].branch_type, taken, bq.bq[pred_tag].fetch_pc, bq.bq[pred_tag].next_pc);
-	 RBP->log_branch(pred_tag, bq.bq[pred_tag].branch_type, taken, bq.bq[pred_tag].fetch_pc, bq.bq[pred_tag].next_pc);
+         //////////////////////////////////////////////
+         // Log the branch in the predictors' logs.
+         //////////////////////////////////////////////
+
+         CBP->log_branch(pred_tag, bq.bq[pred_tag].branch_type, taken, bq.bq[pred_tag].fetch_pc, bq.bq[pred_tag].next_pc);
+         IBP->log_branch(pred_tag, bq.bq[pred_tag].branch_type, taken, bq.bq[pred_tag].fetch_pc, bq.bq[pred_tag].next_pc);
+         RBP->log_branch(pred_tag, bq.bq[pred_tag].branch_type, taken, bq.bq[pred_tag].fetch_pc, bq.bq[pred_tag].next_pc);
       }
 
-      if (IS_INTALU(PAY->buf[index].flags))
-         eligible = PREDINTALU;     // instr. is INTALU type.  It is eligible if predINTALU is configured "true".
-      else if (IS_FPALU(PAY->buf[index].flags))
-         eligible = PREDFPALU;      // instr. is FPALU type.  It is eligible if predFPALU is configured "true".
-      else if (IS_LOAD(PAY->buf[index].flags) && !IS_AMO(PAY->buf[index].flags))
-         eligible = PREDLOAD;      // instr. is a normal LOAD (not rare load-with-reserv).  It is eligible if predLOAD is configured "true".
-      else
-         eligible = false;     // instr. is none of the above major types, so it is never eligible
+      switch(PAY->buf[index].inst.opcode()) {
+         case OP_OP:
+         case OP_OP_32:
+         case OP_OP_IMM:
+			case OP_OP_IMM_32:
+			case OP_LUI:
+			case OP_AUIPC:
+            eligible = PREDINTALU;
+            break;
+         case OP_OP_FP:
+         case OP_MADD:
+         case OP_MSUB:
+         case OP_NMADD:
+         case OP_NMSUB:
+            eligible = PREDFPALU;
+            break;
+         case OP_LOAD:
+         case OP_LOAD_FP:
+            eligible = PREDLOAD;
+            break;
+         default:
+            eligible = false;
+            break;
+      }
 
       if(eligible) {
-         bq.push(pred_tag, pred_tag_phase);
-         // pred_tag_VP = bq.get_pred_tag();
-         // pred_tag_phase_VP = bq.get_pred_phase();
-         PAY->buf[index].pred_tag = ((pred_tag << 1) | (pred_tag_phase ? 1 : 0));
+         // bq.push(pred_tag, pred_tag_phase);
+         PAY->buf[index].pred_tag = ((pred_tag_VP << 1) | (pred_tag_phase_VP ? 1 : 0));
+         // printf("\nIN FETCH2 | full tag with phase checkpointed for predicted value: %lu\n", ((pred_tag_VP << 1) | (pred_tag_phase_VP ? 1 : 0)));
       }
 
       // Go to next instruction in the fetch bundle.
@@ -583,6 +600,8 @@ void fetchunit_t::mispredict(uint64_t branch_pred_tag, bool taken, uint64_t next
 
    uint64_t pred_tag = (branch_pred_tag >> 1);
    bool pred_tag_phase = (((branch_pred_tag & 1) == 1) ? true : false);
+
+   printf("\nIN MISPREDICT | full tag with phase: %lu\n", branch_pred_tag);
 
    // 1. Roll-back the branch queue to the mispredicted branch's entry.
    //    Then push the branch back onto it.
@@ -636,6 +655,7 @@ void fetchunit_t::mispredictVP(uint64_t branch_pred_tag, uint64_t next_pc) {
    // 1. Roll-back the branch queue to the mispredicted branch's entry.
    //    Then push the branch back onto it.
 
+   printf("\nIN MISPREDICTVP | full tag with phase: %lu\n", branch_pred_tag);
    bq.rollback(pred_tag, pred_tag_phase, true);
 
    uint64_t temp_pred_tag;
@@ -663,6 +683,8 @@ void fetchunit_t::commit(uint64_t branch_pred_tag) {
    bq.pop(pred_tag, pred_tag_phase);
 
    // Assert that the branch_pred_tag (pred_tag of the branch being committed from the pipeline) corresponds to the popped branch queue entry.
+   printf("\nIN COMMIT | full tag with phase: %lu\n", branch_pred_tag);
+   printf("\nIN COMMIT | full tag with phase from bq pop: %lu\n", ((pred_tag << 1) | (pred_tag_phase ? 1 : 0)));
    assert(branch_pred_tag == ((pred_tag << 1) | (pred_tag_phase ? 1 : 0)));
 
    // Update the conditional branch predictor or indirect branch predictor.

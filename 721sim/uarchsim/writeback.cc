@@ -169,8 +169,23 @@ void pipeline_t::writeback(unsigned int lane_number) {
                     true);
          }
          else {
+            printf("\nWE ARE MISPREDICT!!!!!!!!!!!!!!!!\n");
             FetchUnit->mispredictVP(PAY.buf[index].pred_tag,
                                      PAY.buf[index].c_next_pc);
+
+            REN->resolve(PAY.buf[index].AL_index,
+                         PAY.buf[index].branch_ID,
+                         false);
+
+            is_load = IS_LOAD(PAY.buf[index].flags);
+            LSU.restore(PAY.buf[index].LQ_index, PAY.buf[index].LQ_phase, PAY.buf[index].SQ_index, PAY.buf[index].SQ_phase, is_load);
+
+            resolve(PAY.buf[index].branch_ID,
+                    false);
+
+            VP->restore(PAY.buf[index].cpt_vpq_tail, PAY.buf[index].cpt_tail_phase);
+
+            PAY.rollback(index);
          }
       }
 
