@@ -157,19 +157,22 @@ void pipeline_t::writeback(unsigned int lane_number) {
       }
       if(PAY.buf[index].confident) {
          if(VP->get_perf()) {
+            printf("WRITEBACK: PERFECT!\n");
             REN->resolve(PAY.buf[index].AL_index,
                          PAY.buf[index].branch_ID,
                          true);
          }
          else if(PAY.buf[index].correct) {
+            printf("WRITEBACK: CORRECT!\n");
             REN->resolve(PAY.buf[index].AL_index,
                          PAY.buf[index].branch_ID,
                          true);
             resolve(PAY.buf[index].branch_ID,
                     true);
+            printf("WRITEBACK: AFTER CORRECT\n");
          }
          else {
-            printf("\nWE ARE MISPREDICT!!!!!!!!!!!!!!!!\n");
+            printf("\nWRITEBACK: WE ARE MISPREDICT!!!!!!!!!!!!!!!!\n");
             FetchUnit->mispredictVP(PAY.buf[index].pred_tag,
                                      PAY.buf[index].c_next_pc);
 
@@ -186,6 +189,7 @@ void pipeline_t::writeback(unsigned int lane_number) {
             VP->restore(PAY.buf[index].cpt_vpq_tail, PAY.buf[index].cpt_tail_phase);
 
             PAY.rollback(index);
+            printf("\nWRITEBACK: AFTER MISPREDICT!!\n");
          }
       }
 

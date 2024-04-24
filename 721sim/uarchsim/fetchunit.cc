@@ -573,7 +573,7 @@ bool fetchunit_t::fetch2(pipeline_register DECODE[]) {
       if(eligible) {
          // bq.push(pred_tag, pred_tag_phase);
          PAY->buf[index].pred_tag = ((pred_tag_VP << 1) | (pred_tag_phase_VP ? 1 : 0));
-         // printf("\nIN FETCH2 | full tag with phase checkpointed for predicted value: %lu\n", ((pred_tag_VP << 1) | (pred_tag_phase_VP ? 1 : 0)));
+         printf("\nIN FETCH2 | full tag with phase checkpointed for predicted value: %lu\n", ((pred_tag_VP << 1) | (pred_tag_phase_VP ? 1 : 0)));
       }
 
       // Go to next instruction in the fetch bundle.
